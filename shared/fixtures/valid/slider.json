@@ -1,0 +1,38 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "component_slider_a2ui",
+      "components": [
+        {
+          "id": "root",
+          "component": "Slider",
+          "label": "Completion",
+          "value": {
+            "path": "/form/progress"
+          },
+          "min": 0,
+          "max": 100
+        }
+      ]
+    }
+  },
+  {
+    "version": "v1.0",
+    "updateDataModel": {
+      "surfaceId": "component_slider_a2ui",
+      "path": "/",
+      "value": {
+        "form": {
+          "name": "Protocol adaptation",
+          "notify": true,
+          "priority": [
+            "high"
+          ],
+          "deadline": "2026-08-31T18:00:00+08:00",
+          "progress": 68
+        }
+      }
+    }
+  }
+]

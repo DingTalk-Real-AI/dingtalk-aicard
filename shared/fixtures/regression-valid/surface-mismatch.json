@@ -1,0 +1,2 @@
+[{"version":"v1.0","updateComponents":{"surfaceId":"s1","components":[{"id":"root","component":"Text","text":"x"}]}},
+ {"version":"v1.0","updateDataModel":{"surfaceId":"s2","path":"/","value":{}}}]

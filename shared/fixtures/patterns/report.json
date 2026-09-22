@@ -1,0 +1,340 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "REPLACE_WITH_REAL_SURFACE_ID",
+      "components": [
+        {
+          "id": "root",
+          "component": "Card",
+          "child": "content",
+          "padding": 12,
+          "cornerRadius": 12
+        },
+        {
+          "id": "content",
+          "component": "Column",
+          "children": [
+            "header",
+            "subtitle",
+            "divider_top",
+            "metrics_title",
+            "metrics",
+            "body",
+            "details",
+            "divider_attachment",
+            "attachment_title",
+            "file",
+            "divider_actions",
+            "actions"
+          ],
+          "align": "stretch",
+          "gap": 8
+        },
+        {
+          "id": "header",
+          "component": "Row",
+          "children": [
+            "title",
+            "status"
+          ],
+          "align": "center",
+          "gap": 8
+        },
+        {
+          "id": "title",
+          "component": "Text",
+          "text": {
+            "path": "/content/title"
+          },
+          "variant": "body",
+          "bold": true,
+          "colorToken": "common_level1_base_color",
+          "maxLine": 2,
+          "weight": 1
+        },
+        {
+          "id": "status",
+          "component": "Tag",
+          "text": {
+            "path": "/content/status"
+          },
+          "theme": "blue"
+        },
+        {
+          "id": "subtitle",
+          "component": "Text",
+          "text": {
+            "path": "/content/subtitle"
+          },
+          "variant": "caption",
+          "colorToken": "common_level2_base_color",
+          "maxLine": 3
+        },
+        {
+          "id": "divider_top",
+          "component": "Divider",
+          "axis": "horizontal",
+          "borderColorToken": "common_line_light_color"
+        },
+        {
+          "id": "metrics_title",
+          "component": "Text",
+          "text": "关键指标",
+          "variant": "body",
+          "bold": true,
+          "colorToken": "common_level1_base_color"
+        },
+        {
+          "id": "metrics",
+          "component": "Row",
+          "children": [
+            "metric_1",
+            "metric_2",
+            "metric_3"
+          ],
+          "align": "start",
+          "gap": 8
+        },
+        {
+          "id": "metric_1",
+          "component": "Column",
+          "children": [
+            "metric_value_1",
+            "metric_label_1"
+          ],
+          "gap": 4,
+          "padding": 12,
+          "cornerRadius": 8,
+          "weight": 1
+        },
+        {
+          "id": "metric_value_1",
+          "component": "Text",
+          "text": {
+            "path": "/content/metrics/m1/value"
+          },
+          "variant": "body",
+          "bold": true,
+          "colorToken": "common_level1_base_color",
+          "maxLine": 2
+        },
+        {
+          "id": "metric_label_1",
+          "component": "Text",
+          "text": {
+            "path": "/content/metrics/m1/label"
+          },
+          "variant": "caption",
+          "colorToken": "common_level2_base_color",
+          "maxLine": 2
+        },
+        {
+          "id": "metric_2",
+          "component": "Column",
+          "children": [
+            "metric_value_2",
+            "metric_label_2"
+          ],
+          "gap": 4,
+          "padding": 12,
+          "cornerRadius": 8,
+          "weight": 1
+        },
+        {
+          "id": "metric_value_2",
+          "component": "Text",
+          "text": {
+            "path": "/content/metrics/m2/value"
+          },
+          "variant": "body",
+          "bold": true,
+          "colorToken": "common_level1_base_color",
+          "maxLine": 2
+        },
+        {
+          "id": "metric_label_2",
+          "component": "Text",
+          "text": {
+            "path": "/content/metrics/m2/label"
+          },
+          "variant": "caption",
+          "colorToken": "common_level2_base_color",
+          "maxLine": 2
+        },
+        {
+          "id": "metric_3",
+          "component": "Column",
+          "children": [
+            "metric_value_3",
+            "metric_label_3"
+          ],
+          "gap": 4,
+          "padding": 12,
+          "cornerRadius": 8,
+          "weight": 1
+        },
+        {
+          "id": "metric_value_3",
+          "component": "Text",
+          "text": {
+            "path": "/content/metrics/m3/value"
+          },
+          "variant": "body",
+          "bold": true,
+          "colorToken": "common_level1_base_color",
+          "maxLine": 2
+        },
+        {
+          "id": "metric_label_3",
+          "component": "Text",
+          "text": {
+            "path": "/content/metrics/m3/label"
+          },
+          "variant": "caption",
+          "colorToken": "common_level2_base_color",
+          "maxLine": 2
+        },
+        {
+          "id": "body",
+          "component": "Markdown",
+          "content": {
+            "path": "/content/body"
+          }
+        },
+        {
+          "id": "details",
+          "component": "CollapsiblePanel",
+          "title": "数据口径与补充说明",
+          "variant": "indented",
+          "defaultExpanded": false,
+          "maxHeight": 240,
+          "children": [
+            "details_content"
+          ],
+          "fallbackMarkdown": "### 数据口径与补充说明\n\n请打开完整报告查看。"
+        },
+        {
+          "id": "details_content",
+          "component": "Column",
+          "children": [
+            "details_body"
+          ],
+          "align": "stretch",
+          "gap": 8,
+          "padding": 12
+        },
+        {
+          "id": "details_body",
+          "component": "Markdown",
+          "content": {
+            "path": "/content/details"
+          }
+        },
+        {
+          "id": "divider_attachment",
+          "component": "Divider",
+          "axis": "horizontal",
+          "borderColorToken": "common_line_light_color"
+        },
+        {
+          "id": "attachment_title",
+          "component": "Text",
+          "text": "完整报告",
+          "variant": "body",
+          "bold": true,
+          "colorToken": "common_level1_base_color"
+        },
+        {
+          "id": "file",
+          "component": "File",
+          "fileName": {
+            "path": "/content/file/name"
+          },
+          "url": "https://REPLACE_WITH_FILE_URL",
+          "description": {
+            "path": "/content/file/description"
+          },
+          "onPreview": {
+            "event": {
+              "name": "report_file_preview",
+              "context": {
+                "bizId": "REPLACE_WITH_BIZ_ID"
+              }
+            }
+          }
+        },
+        {
+          "id": "divider_actions",
+          "component": "Divider",
+          "axis": "horizontal",
+          "borderColorToken": "common_line_light_color"
+        },
+        {
+          "id": "primary_label",
+          "component": "Text",
+          "text": "查看完整报告",
+          "variant": "body"
+        },
+        {
+          "id": "primary_button",
+          "component": "Button",
+          "child": "primary_label",
+          "variant": "primary",
+          "weight": 1,
+          "action": {
+            "event": {
+              "name": "report_primary",
+              "context": {
+                "bizId": "REPLACE_WITH_BIZ_ID"
+              }
+            }
+          }
+        },
+        {
+          "id": "actions",
+          "component": "Row",
+          "children": [
+            "primary_button"
+          ],
+          "align": "center",
+          "gap": 8
+        }
+      ]
+    }
+  },
+  {
+    "version": "v1.0",
+    "updateDataModel": {
+      "surfaceId": "REPLACE_WITH_REAL_SURFACE_ID",
+      "path": "/",
+      "value": {
+        "content": {
+          "title": "服务质量周报",
+          "subtitle": "第 37 周 · 生产环境",
+          "status": "已生成",
+          "metrics": {
+            "m1": {
+              "value": "99.95%",
+              "label": "可用性"
+            },
+            "m2": {
+              "value": "182 ms",
+              "label": "P95 延迟"
+            },
+            "m3": {
+              "value": "3",
+              "label": "P1 事件"
+            }
+          },
+          "body": "本周可用性达标，一起 P1 由数据库连接池耗尽引起，已于 30 分钟内恢复。",
+          "details": "- 口径：北京时间周一 00:00 至周日 24:00\n- 延迟为网关侧统计",
+          "file": {
+            "name": "第37周-服务质量周报.pdf",
+            "description": "含全部指标明细"
+          }
+        }
+      }
+    }
+  }
+]

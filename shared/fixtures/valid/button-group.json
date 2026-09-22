@@ -1,0 +1,57 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "component_button_group_a2ui",
+      "components": [
+        {
+          "id": "root",
+          "component": "ButtonGroup",
+          "responsive": true,
+          "gap": 12,
+          "buttons": [
+            {
+              "label": "Approve",
+              "variant": "primary",
+              "action": {
+                "event": {
+                  "name": "approve",
+                  "context": {
+                    "orderId": {
+                      "path": "/order/id"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "label": "Reject",
+              "action": {
+                "event": {
+                  "name": "reject",
+                  "context": {}
+                }
+              }
+            },
+            {
+              "label": "Archived",
+              "disabled": true
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "version": "v1.0",
+    "updateDataModel": {
+      "surfaceId": "component_button_group_a2ui",
+      "path": "/",
+      "value": {
+        "order": {
+          "id": "demo-order"
+        }
+      }
+    }
+  }
+]

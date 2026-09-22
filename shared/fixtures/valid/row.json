@@ -1,0 +1,48 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "component_row_a2ui",
+      "components": [
+        {
+          "id": "root",
+          "component": "Row",
+          "children": [
+            "a",
+            "b"
+          ],
+          "justify": "start",
+          "align": "center"
+        },
+        {
+          "id": "a",
+          "component": "Text",
+          "weight": 1,
+          "text": {
+            "path": "/row/left"
+          }
+        },
+        {
+          "id": "b",
+          "component": "Text",
+          "text": {
+            "path": "/row/right"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "version": "v1.0",
+    "updateDataModel": {
+      "surfaceId": "component_row_a2ui",
+      "path": "/",
+      "value": {
+        "row": {
+          "left": "Left",
+          "right": "Right"
+        }
+      }
+    }
+  }
+]

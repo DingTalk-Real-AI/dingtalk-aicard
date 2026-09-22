@@ -1,0 +1,38 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "s",
+      "components": [
+        {
+          "id": "root",
+          "component": "Button",
+          "checks": [
+            {
+              "condition": {
+                "call": "and",
+                "args": {
+                  "values": [
+                    true
+                  ]
+                }
+              },
+              "message": "m"
+            }
+          ],
+          "child": "label",
+          "action": {
+            "event": {
+              "name": "submit"
+            }
+          }
+        },
+        {
+          "id": "label",
+          "component": "Text",
+          "text": "提交"
+        }
+      ]
+    }
+  }
+]

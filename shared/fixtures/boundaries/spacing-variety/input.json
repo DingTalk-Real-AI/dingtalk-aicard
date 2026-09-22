@@ -1,0 +1,6 @@
+[{"version":"v1.0","updateComponents":{"surfaceId":"s","components":[
+ {"id":"root","component":"Column","children":["a","b","c"],"gap":3,"padding":7},
+ {"id":"a","component":"Column","children":["t"],"gap":5,"padding":11},
+ {"id":"b","component":"Column","children":["u"],"gap":9},
+ {"id":"c","component":"Text","text":"x","bold":true},
+ {"id":"t","component":"Text","text":"y"},{"id":"u","component":"Text","text":"z","variant":"caption"}]}}]

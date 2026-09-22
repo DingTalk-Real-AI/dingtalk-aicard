@@ -1,0 +1,30 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "component_avatar_a2ui",
+      "components": [
+        {
+          "id": "root",
+          "component": "Avatar",
+          "imageUrl": {
+            "path": "/avatar/imageUrl"
+          },
+          "size": "small"
+        }
+      ]
+    }
+  },
+  {
+    "version": "v1.0",
+    "updateDataModel": {
+      "surfaceId": "component_avatar_a2ui",
+      "path": "/",
+      "value": {
+        "avatar": {
+          "imageUrl": "https://example.com/images/sample-1.jpg"
+        }
+      }
+    }
+  }
+]

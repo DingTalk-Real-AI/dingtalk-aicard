@@ -1,0 +1,4 @@
+[{"version":"v1.0","updateComponents":{"surfaceId":"s","components":[
+ {"id":"root","component":"Text","text":{"path":"/a/b"}}]}},
+ {"version":"v1.0","updateDataModel":{"surfaceId":"s","path":"/","value":{"a":{"b":"x"}}}},
+ {"version":"v1.0","updateDataModel":{"surfaceId":"s","path":"/a/b","value":null}}]

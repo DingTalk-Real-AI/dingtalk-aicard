@@ -1,0 +1,38 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "component_switch_a2ui",
+      "components": [
+        {
+          "id": "root",
+          "component": "Switch",
+          "value": {
+            "path": "/settings/notification"
+          },
+          "size": "normal",
+          "action": {
+            "event": {
+              "name": "switch_action",
+              "context": {
+                "component": "Switch"
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  {
+    "version": "v1.0",
+    "updateDataModel": {
+      "surfaceId": "component_switch_a2ui",
+      "path": "/",
+      "value": {
+        "settings": {
+          "notification": true
+        }
+      }
+    }
+  }
+]

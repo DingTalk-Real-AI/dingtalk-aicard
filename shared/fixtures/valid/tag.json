@@ -1,0 +1,32 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "component_tag_a2ui",
+      "components": [
+        {
+          "id": "root",
+          "component": "Row",
+          "children": [
+            "label",
+            "level"
+          ],
+          "justify": "start",
+          "align": "center",
+          "gap": 8
+        },
+        {
+          "id": "label",
+          "component": "Text",
+          "text": "Watchlist (2024)"
+        },
+        {
+          "id": "level",
+          "component": "Tag",
+          "text": "High risk",
+          "theme": "red"
+        }
+      ]
+    }
+  }
+]

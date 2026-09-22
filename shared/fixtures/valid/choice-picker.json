@@ -1,0 +1,75 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "component_choice_picker_a2ui",
+      "components": [
+        {
+          "id": "root",
+          "component": "ChoicePicker",
+          "label": {
+            "path": "/choicePicker/label"
+          },
+          "variant": "multipleSelection",
+          "options": [
+            {
+              "label": "Product design",
+              "value": "design"
+            },
+            {
+              "label": "Frontend",
+              "value": "frontend"
+            },
+            {
+              "label": "QA",
+              "value": "qa"
+            }
+          ],
+          "value": {
+            "path": "/choicePicker/value"
+          },
+          "displayStyle": "checkbox",
+          "checks": [
+            {
+              "condition": {
+                "call": "gte",
+                "args": {
+                  "a": {
+                    "call": "getLength",
+                    "args": {
+                      "value": {
+                        "path": "/choicePicker/value"
+                      }
+                    }
+                  },
+                  "b": 1
+                }
+              },
+              "message": "Select at least one team"
+            }
+          ],
+          "accessibility": {
+            "label": "Teams involved",
+            "description": "Select one or more teams"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "version": "v1.0",
+    "updateDataModel": {
+      "surfaceId": "component_choice_picker_a2ui",
+      "path": "/",
+      "value": {
+        "choicePicker": {
+          "label": "Teams involved",
+          "value": [
+            "design",
+            "frontend"
+          ]
+        }
+      }
+    }
+  }
+]

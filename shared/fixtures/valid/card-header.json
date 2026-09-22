@@ -1,0 +1,50 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "component_card_header_a2ui",
+      "components": [
+        {
+          "id": "root",
+          "component": "CardHeader",
+          "title": {
+            "path": "/cardHeader/title"
+          },
+          "theme": {
+            "path": "/cardHeader/theme"
+          },
+          "icon": {
+            "path": "/cardHeader/icon"
+          },
+          "darkIcon": {
+            "path": "/cardHeader/darkIcon"
+          },
+          "trailing": "card_header_status"
+        },
+        {
+          "id": "card_header_status",
+          "component": "Text",
+          "text": {
+            "path": "/cardHeader/status"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "version": "v1.0",
+    "updateDataModel": {
+      "surfaceId": "component_card_header_a2ui",
+      "path": "/",
+      "value": {
+        "cardHeader": {
+          "title": "Approval notice",
+          "theme": "blue",
+          "icon": "https://example.com/images/sample-1.jpg",
+          "darkIcon": "https://example.com/images/sample-2.jpg",
+          "status": "Pending"
+        }
+      }
+    }
+  }
+]

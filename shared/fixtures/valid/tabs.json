@@ -1,0 +1,51 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "component_tabs_a2ui",
+      "components": [
+        {
+          "id": "root",
+          "component": "Tabs",
+          "tabs": [
+            {
+              "title": "Details",
+              "child": "detail"
+            },
+            {
+              "title": "Record",
+              "child": "history"
+            }
+          ]
+        },
+        {
+          "id": "detail",
+          "component": "Text",
+          "text": {
+            "path": "/tabs/detail"
+          }
+        },
+        {
+          "id": "history",
+          "component": "Text",
+          "text": {
+            "path": "/tabs/history"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "version": "v1.0",
+    "updateDataModel": {
+      "surfaceId": "component_tabs_a2ui",
+      "path": "/",
+      "value": {
+        "tabs": {
+          "detail": "Detail content",
+          "history": "Activity log"
+        }
+      }
+    }
+  }
+]

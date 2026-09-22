@@ -1,0 +1,90 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "REPLACE_WITH_REAL_SURFACE_ID",
+      "components": [
+        {
+          "id": "content",
+          "component": "Column",
+          "children": [
+            "header",
+            "subtitle",
+            "divider_top",
+            "facts",
+            "body",
+            "divider_terminal",
+            "terminal"
+          ],
+          "align": "stretch",
+          "gap": 8
+        },
+        {
+          "id": "divider_terminal",
+          "component": "Divider",
+          "axis": "horizontal",
+          "borderColorToken": "common_line_light_color"
+        },
+        {
+          "id": "terminal",
+          "component": "Row",
+          "children": [
+            "terminal_tag",
+            "terminal_text",
+            "terminal_link"
+          ],
+          "align": "center",
+          "gap": 8
+        },
+        {
+          "id": "terminal_tag",
+          "component": "Tag",
+          "text": {
+            "path": "/content/status"
+          },
+          "theme": "green"
+        },
+        {
+          "id": "terminal_text",
+          "component": "Text",
+          "text": {
+            "path": "/content/terminalText"
+          },
+          "variant": "caption",
+          "colorToken": "common_level2_base_color",
+          "maxLine": 2,
+          "weight": 1
+        },
+        {
+          "id": "terminal_link",
+          "component": "Link",
+          "text": "查看记录",
+          "action": {
+            "functionCall": {
+              "call": "openUrl",
+              "args": {
+                "url": "https://REPLACE_WITH_DETAIL_URL"
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  {
+    "version": "v1.0",
+    "updateDataModel": {
+      "surfaceId": "REPLACE_WITH_REAL_SURFACE_ID",
+      "path": "/content/status",
+      "value": "已同意"
+    }
+  },
+  {
+    "version": "v1.0",
+    "updateDataModel": {
+      "surfaceId": "REPLACE_WITH_REAL_SURFACE_ID",
+      "path": "/content/terminalText",
+      "value": "张三 于 15:32 同意，意见：可以发布"
+    }
+  }
+]

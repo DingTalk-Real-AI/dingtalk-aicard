@@ -1,0 +1,40 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "component_number_input_a2ui",
+      "components": [
+        {
+          "id": "root",
+          "component": "NumberInput",
+          "value": {
+            "path": "/form/quantity"
+          },
+          "min": 1,
+          "max": 999,
+          "placeholder": "Count",
+          "action": {
+            "event": {
+              "name": "number_input_action",
+              "context": {
+                "component": "NumberInput"
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  {
+    "version": "v1.0",
+    "updateDataModel": {
+      "surfaceId": "component_number_input_a2ui",
+      "path": "/",
+      "value": {
+        "form": {
+          "quantity": 1
+        }
+      }
+    }
+  }
+]

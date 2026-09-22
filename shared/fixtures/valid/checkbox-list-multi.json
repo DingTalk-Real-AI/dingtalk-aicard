@@ -1,0 +1,68 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "component_checkbox_list_multi_a2ui",
+      "components": [
+        {
+          "id": "root",
+          "component": "CheckboxListMulti",
+          "children": {
+            "componentId": "checkbox_multi_label",
+            "path": "/checkboxMulti/items"
+          },
+          "selectedIndexes": [
+            0,
+            1
+          ],
+          "size": "middle",
+          "disabled": false,
+          "contentCheckable": true,
+          "action": {
+            "event": {
+              "name": "checkbox_list_changed",
+              "context": {
+                "selectedIndexes": [
+                  0,
+                  1
+                ]
+              }
+            }
+          }
+        },
+        {
+          "id": "checkbox_multi_label",
+          "component": "Text",
+          "text": {
+            "path": "label"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "version": "v1.0",
+    "updateDataModel": {
+      "surfaceId": "component_checkbox_list_multi_a2ui",
+      "path": "/",
+      "value": {
+        "checkboxMulti": {
+          "items": [
+            {
+              "label": "Requirements",
+              "value": "analysis"
+            },
+            {
+              "label": "Visual design",
+              "value": "design"
+            },
+            {
+              "label": "Integration",
+              "value": "development"
+            }
+          ]
+        }
+      }
+    }
+  }
+]

@@ -1,0 +1,41 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "component_rating_a2ui",
+      "components": [
+        {
+          "id": "root",
+          "component": "Rating",
+          "value": {
+            "path": "/data/rate/value"
+          },
+          "onTap": {
+            "event": {
+              "name": "rate_tap",
+              "context": {
+                "value": {
+                  "path": "/data/rate/value"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  {
+    "version": "v1.0",
+    "updateDataModel": {
+      "surfaceId": "component_rating_a2ui",
+      "path": "/",
+      "value": {
+        "data": {
+          "rate": {
+            "value": 4.5
+          }
+        }
+      }
+    }
+  }
+]

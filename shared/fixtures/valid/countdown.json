@@ -1,0 +1,40 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "component_countdown_a2ui",
+      "components": [
+        {
+          "id": "root",
+          "component": "Countdown",
+          "endTime": {
+            "path": "/data/countdown/endTime"
+          },
+          "gravity": "left",
+          "onComplete": {
+            "event": {
+              "name": "countdown_finish",
+              "context": {
+                "status": "expired"
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  {
+    "version": "v1.0",
+    "updateDataModel": {
+      "surfaceId": "component_countdown_a2ui",
+      "path": "/",
+      "value": {
+        "data": {
+          "countdown": {
+            "endTime": 1753660800000
+          }
+        }
+      }
+    }
+  }
+]

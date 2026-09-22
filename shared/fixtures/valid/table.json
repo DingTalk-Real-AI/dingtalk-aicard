@@ -1,0 +1,68 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "component_table_a2ui",
+      "components": [
+        {
+          "id": "root",
+          "component": "Table",
+          "data": {
+            "path": "/data/table"
+          },
+          "pageSize": 5,
+          "maxLine": 2,
+          "zebra": true,
+          "pagination": true
+        }
+      ]
+    }
+  },
+  {
+    "version": "v1.0",
+    "updateDataModel": {
+      "surfaceId": "component_table_a2ui",
+      "path": "/",
+      "value": {
+        "data": {
+          "table": {
+            "meta": [
+              {
+                "colKey": "name",
+                "colName": "Name",
+                "type": "text"
+              },
+              {
+                "colKey": "dept",
+                "colName": "Department",
+                "type": "text"
+              },
+              {
+                "colKey": "status",
+                "colName": "Status",
+                "type": "tag"
+              }
+            ],
+            "data": [
+              {
+                "name": "Alice",
+                "dept": "Engineering",
+                "status": "Online"
+              },
+              {
+                "name": "Bob",
+                "dept": "Product",
+                "status": "Offline"
+              },
+              {
+                "name": "Carol",
+                "dept": "Design",
+                "status": "Busy"
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+]

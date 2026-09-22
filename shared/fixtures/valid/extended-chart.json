@@ -1,0 +1,40 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "open-chart",
+      "components": [
+        {
+          "id": "root",
+          "component": "Column",
+          "children": [
+            "title",
+            "chart"
+          ]
+        },
+        {
+          "id": "title",
+          "component": "Text",
+          "text": "Task distribution"
+        },
+        {
+          "id": "chart",
+          "component": "Chart",
+          "data": {
+            "type": "pieChart",
+            "data": [
+              {
+                "x": "Completed",
+                "y": 8
+              },
+              {
+                "x": "Pending",
+                "y": 3
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+]

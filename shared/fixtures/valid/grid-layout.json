@@ -1,0 +1,57 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "component_grid_layout_a2ui",
+      "components": [
+        {
+          "id": "root",
+          "component": "GridLayout",
+          "children": {
+            "componentId": "grid_item_template",
+            "path": "/data/gridLayout/items"
+          },
+          "columns": 2,
+          "columnGap": 8,
+          "rowGap": 8,
+          "itemHeight": 64
+        },
+        {
+          "id": "grid_item_template",
+          "component": "Text",
+          "text": {
+            "path": "label"
+          },
+          "bold": true
+        }
+      ]
+    }
+  },
+  {
+    "version": "v1.0",
+    "updateDataModel": {
+      "surfaceId": "component_grid_layout_a2ui",
+      "path": "/",
+      "value": {
+        "data": {
+          "gridLayout": {
+            "items": [
+              {
+                "label": "Approval"
+              },
+              {
+                "label": "Schedule"
+              },
+              {
+                "label": "Attendance"
+              },
+              {
+                "label": "Document"
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+]

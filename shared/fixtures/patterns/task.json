@@ -1,0 +1,251 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "REPLACE_WITH_REAL_SURFACE_ID",
+      "components": [
+        {
+          "id": "root",
+          "component": "Card",
+          "child": "content",
+          "padding": 0,
+          "cornerRadius": 12
+        },
+        {
+          "id": "content",
+          "component": "Column",
+          "children": [
+            "header",
+            "compact_body"
+          ],
+          "align": "stretch",
+          "gap": 0
+        },
+        {
+          "id": "compact_body",
+          "component": "Column",
+          "children": [
+            "subtitle",
+            "facts",
+            "body",
+            "divider_actions",
+            "actions"
+          ],
+          "align": "stretch",
+          "gap": 8,
+          "padding": 8
+        },
+        {
+          "id": "header",
+          "component": "CardHeader",
+          "title": {
+            "path": "/content/title"
+          },
+          "theme": "blue",
+          "trailing": "status",
+          "fallbackMarkdown": "**任务** · 见正文"
+        },
+        {
+          "id": "status",
+          "component": "Tag",
+          "text": {
+            "path": "/content/status"
+          },
+          "theme": "orange"
+        },
+        {
+          "id": "subtitle",
+          "component": "Text",
+          "text": {
+            "path": "/content/subtitle"
+          },
+          "variant": "caption",
+          "colorToken": "common_level2_base_color",
+          "maxLine": 3
+        },
+        {
+          "id": "facts",
+          "component": "Column",
+          "children": [
+            "fact_1",
+            "fact_2",
+            "fact_3"
+          ],
+          "gap": 4
+        },
+        {
+          "id": "fact_1",
+          "component": "Row",
+          "children": [
+            "fact_1_k",
+            "fact_1_v"
+          ],
+          "align": "center",
+          "gap": 8
+        },
+        {
+          "id": "fact_1_k",
+          "component": "Text",
+          "text": "负责人",
+          "variant": "caption",
+          "colorToken": "common_level2_base_color",
+          "maxLine": 1
+        },
+        {
+          "id": "fact_1_v",
+          "component": "Text",
+          "text": {
+            "path": "/content/facts/owner"
+          },
+          "variant": "body",
+          "colorToken": "common_level1_base_color",
+          "maxLine": 2,
+          "weight": 1
+        },
+        {
+          "id": "fact_2",
+          "component": "Row",
+          "children": [
+            "fact_2_k",
+            "fact_2_v"
+          ],
+          "align": "center",
+          "gap": 8
+        },
+        {
+          "id": "fact_2_k",
+          "component": "Text",
+          "text": "截止",
+          "variant": "caption",
+          "colorToken": "common_level2_base_color",
+          "maxLine": 1
+        },
+        {
+          "id": "fact_2_v",
+          "component": "Text",
+          "text": {
+            "path": "/content/facts/deadline"
+          },
+          "variant": "body",
+          "colorToken": "common_level1_base_color",
+          "maxLine": 2,
+          "weight": 1
+        },
+        {
+          "id": "fact_3",
+          "component": "Row",
+          "children": [
+            "fact_3_k",
+            "fact_3_v"
+          ],
+          "align": "center",
+          "gap": 8
+        },
+        {
+          "id": "fact_3_k",
+          "component": "Text",
+          "text": "优先级",
+          "variant": "caption",
+          "colorToken": "common_level2_base_color",
+          "maxLine": 1
+        },
+        {
+          "id": "fact_3_v",
+          "component": "Text",
+          "text": {
+            "path": "/content/facts/priority"
+          },
+          "variant": "body",
+          "colorToken": "common_level1_base_color",
+          "maxLine": 2,
+          "weight": 1
+        },
+        {
+          "id": "body",
+          "component": "Markdown",
+          "content": {
+            "path": "/content/body"
+          }
+        },
+        {
+          "id": "divider_actions",
+          "component": "Divider",
+          "axis": "horizontal",
+          "borderColorToken": "common_line_light_color"
+        },
+        {
+          "id": "secondary_label",
+          "component": "Text",
+          "text": "稍后处理",
+          "variant": "body"
+        },
+        {
+          "id": "secondary_button",
+          "component": "Button",
+          "child": "secondary_label",
+          "variant": "default",
+          "weight": 1,
+          "action": {
+            "event": {
+              "name": "task_secondary",
+              "context": {
+                "bizId": "REPLACE_WITH_BIZ_ID"
+              }
+            }
+          }
+        },
+        {
+          "id": "primary_label",
+          "component": "Text",
+          "text": "开始处理",
+          "variant": "body"
+        },
+        {
+          "id": "primary_button",
+          "component": "Button",
+          "child": "primary_label",
+          "variant": "primary",
+          "weight": 1,
+          "action": {
+            "event": {
+              "name": "task_primary",
+              "context": {
+                "bizId": "REPLACE_WITH_BIZ_ID"
+              }
+            }
+          }
+        },
+        {
+          "id": "actions",
+          "component": "Row",
+          "children": [
+            "secondary_button",
+            "primary_button"
+          ],
+          "align": "center",
+          "gap": 8
+        }
+      ]
+    }
+  },
+  {
+    "version": "v1.0",
+    "updateDataModel": {
+      "surfaceId": "REPLACE_WITH_REAL_SURFACE_ID",
+      "path": "/",
+      "value": {
+        "content": {
+          "title": "修复登录页空白问题",
+          "subtitle": "前端平台组 · 刚刚分派",
+          "status": "待处理",
+          "facts": {
+            "owner": "李四",
+            "deadline": "今天 18:00",
+            "priority": "高"
+          },
+          "body": "灰度环境登录页在弱网下白屏，复现步骤见工单。"
+        }
+      }
+    }
+  }
+]

@@ -1,0 +1,297 @@
+{
+  "invalid/bad-color-token": {
+    "valid": false,
+    "diagnostics": [
+      {
+        "code": "schema.bad_enum",
+        "severity": "error",
+        "pointer": "/0/updateComponents/components/0/colorToken"
+      }
+    ]
+  },
+  "invalid/bad-version": {
+    "valid": false,
+    "diagnostics": [
+      {
+        "code": "schema.bad_enum",
+        "severity": "error",
+        "pointer": "/0/version"
+      }
+    ]
+  },
+  "boundaries/binding-deleted-by-null": {
+    "valid": true,
+    "diagnostics": [],
+    "reason": "Only structure is checked; binding.missing_initial_value does not determine runtime state or design."
+  },
+  "invalid/binding-extra-properties": {
+    "valid": false,
+    "diagnostics": [
+      {
+        "code": "schema.unknown_property",
+        "severity": "error",
+        "pointer": "/0/updateComponents/components/0/text/default"
+      }
+    ]
+  },
+  "boundaries/binding-missing": {
+    "valid": true,
+    "diagnostics": [],
+    "reason": "Only structure is checked; binding.missing_initial_value does not determine runtime state or design."
+  },
+  "invalid/bool-as-number": {
+    "valid": false,
+    "diagnostics": [
+      {
+        "code": "schema.type_mismatch",
+        "severity": "error",
+        "pointer": "/0/updateComponents/components/1/padding"
+      }
+    ]
+  },
+  "boundaries/check-not-boolean": {
+    "valid": true,
+    "diagnostics": [],
+    "reason": "Only structure is checked; action.check_not_boolean does not determine runtime state or design."
+  },
+  "boundaries/cycle": {
+    "valid": true,
+    "diagnostics": [],
+    "reason": "Only structure is checked; reference.cycle does not determine runtime state or design."
+  },
+  "boundaries/dangling-child": {
+    "valid": true,
+    "diagnostics": [],
+    "reason": "Only structure is checked; reference.dangling_child does not determine runtime state or design."
+  },
+  "boundaries/dangling-stack-overlay": {
+    "valid": true,
+    "diagnostics": [],
+    "reason": "Only structure is checked; reference.dangling_child does not determine runtime state or design."
+  },
+  "boundaries/dangling-tabs-child": {
+    "valid": true,
+    "diagnostics": [],
+    "reason": "Only structure is checked; reference.dangling_child does not determine runtime state or design."
+  },
+  "invalid/dict-neither-binding-nor-call": {
+    "valid": false,
+    "diagnostics": [
+      {
+        "code": "schema.missing_required",
+        "severity": "error",
+        "pointer": "/0/updateComponents/components/0/text"
+      }
+    ]
+  },
+  "boundaries/duplicate-id": {
+    "valid": true,
+    "diagnostics": [],
+    "reason": "Only structure is checked; reference.duplicate_id does not determine runtime state or design."
+  },
+  "boundaries/empty-container": {
+    "valid": true,
+    "diagnostics": [],
+    "reason": "Only structure is checked; design.empty_container does not determine runtime state or design."
+  },
+  "invalid/envelope-unknown-property": {
+    "valid": false,
+    "diagnostics": [
+      {
+        "code": "schema.unknown_property",
+        "severity": "error",
+        "pointer": "/0/updateComponents/extraProp"
+      }
+    ]
+  },
+  "invalid/event-name-missing": {
+    "valid": false,
+    "diagnostics": [
+      {
+        "code": "schema.missing_required",
+        "severity": "error",
+        "pointer": "/0/updateComponents/components/0/action/event"
+      }
+    ]
+  },
+  "boundaries/flat-text-hierarchy": {
+    "valid": true,
+    "diagnostics": [],
+    "reason": "Only structure is checked; design.flat_hierarchy does not determine runtime state or design."
+  },
+  "invalid/host-action-no-catalog": {
+    "valid": false,
+    "diagnostics": [
+      {
+        "code": "schema.missing_required",
+        "severity": "error",
+        "pointer": "/0/updateComponents/components/0/action/functionCall"
+      }
+    ]
+  },
+  "boundaries/insecure-image": {
+    "valid": true,
+    "diagnostics": [],
+    "reason": "Only structure is checked; delivery.insecure_resource_url does not determine runtime state or design."
+  },
+  "invalid/invalid-extension-key": {
+    "valid": false,
+    "diagnostics": [
+      {
+        "code": "schema.unknown_property",
+        "severity": "error",
+        "pointer": "/0/createSurface/metadata/extensions/123bad"
+      }
+    ]
+  },
+  "invalid/missing-required": {
+    "valid": false,
+    "diagnostics": [
+      {
+        "code": "schema.missing_required",
+        "severity": "error",
+        "pointer": "/0/updateComponents/components/0"
+      }
+    ]
+  },
+  "boundaries/missing-root": {
+    "valid": true,
+    "diagnostics": [],
+    "reason": "Only structure is checked; reference.missing_root does not determine runtime state or design."
+  },
+  "invalid/operation-not-accepted": {
+    "valid": false,
+    "diagnostics": [
+      {
+        "code": "schema.missing_required",
+        "severity": "error",
+        "pointer": "/1"
+      }
+    ]
+  },
+  "boundaries/placeholder-left": {
+    "valid": true,
+    "diagnostics": [],
+    "reason": "Only structure is checked; input.placeholder_left does not determine runtime state or design."
+  },
+  "invalid/prompt-text-misuse": {
+    "valid": false,
+    "diagnostics": [
+      {
+        "code": "schema.unknown_property",
+        "severity": "error",
+        "pointer": "/0/updateComponents/components/0/action/functionCall/args/text"
+      }
+    ]
+  },
+  "boundaries/relative-outside-template": {
+    "valid": true,
+    "diagnostics": [],
+    "reason": "Only structure is checked; binding.relative_outside_template does not determine runtime state or design."
+  },
+  "invalid/return-type-mismatch": {
+    "valid": false,
+    "diagnostics": [
+      {
+        "code": "schema.unknown_property",
+        "severity": "error",
+        "pointer": "/0/updateComponents/components/0/checks/0/condition/returnType"
+      }
+    ]
+  },
+  "boundaries/row-align-stretch": {
+    "valid": true,
+    "diagnostics": [],
+    "reason": "Only structure is checked; design.stretch_align does not determine runtime state or design."
+  },
+  "boundaries/spacing-variety": {
+    "valid": true,
+    "diagnostics": [],
+    "reason": "Only structure is checked; design.spacing_variety does not determine runtime state or design."
+  },
+  "invalid/system-function-catalog": {
+    "valid": false,
+    "diagnostics": [
+      {
+        "code": "schema.unknown_property",
+        "severity": "error",
+        "pointer": "/0/updateComponents/components/1/text/catalogId"
+      }
+    ]
+  },
+  "boundaries/too-deep": {
+    "valid": true,
+    "diagnostics": [],
+    "reason": "Only structure is checked; input.too_deep does not determine runtime state or design."
+  },
+  "invalid/too-few-items": {
+    "valid": false,
+    "diagnostics": [
+      {
+        "code": "schema.too_few_items",
+        "severity": "error",
+        "pointer": "/0/updateComponents/components/0/checks/0/condition/args/values"
+      }
+    ]
+  },
+  "invalid/two-operations": {
+    "valid": false,
+    "diagnostics": [
+      {
+        "code": "schema.unknown_property",
+        "severity": "error",
+        "pointer": "/0/updateDataModel"
+      }
+    ]
+  },
+  "boundaries/two-primary-buttons": {
+    "valid": true,
+    "diagnostics": [],
+    "reason": "Only structure is checked; design.multiple_primary_actions does not determine runtime state or design."
+  },
+  "invalid/type-mismatch": {
+    "valid": false,
+    "diagnostics": [
+      {
+        "code": "schema.type_mismatch",
+        "severity": "error",
+        "pointer": "/0/updateComponents/components/0/text"
+      }
+    ]
+  },
+  "boundaries/unbounded-dynamic-text": {
+    "valid": true,
+    "diagnostics": [],
+    "reason": "Only structure is checked; design.unbounded_dynamic_text does not determine runtime state or design."
+  },
+  "invalid/unknown-arg": {
+    "valid": false,
+    "diagnostics": [
+      {
+        "code": "schema.unknown_property",
+        "severity": "error",
+        "pointer": "/0/updateComponents/components/0/checks/0/condition/args/bogus"
+      }
+    ]
+  },
+  "invalid/unknown-component": {
+    "valid": false,
+    "diagnostics": [
+      {
+        "code": "schema.bad_enum",
+        "severity": "error",
+        "pointer": "/0/updateComponents/components/0/component"
+      }
+    ]
+  },
+  "invalid/unknown-function": {
+    "valid": false,
+    "diagnostics": [
+      {
+        "code": "schema.bad_enum",
+        "severity": "error",
+        "pointer": "/0/updateComponents/components/0/action/functionCall/call"
+      }
+    ]
+  }
+}

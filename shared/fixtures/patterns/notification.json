@@ -1,0 +1,123 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "REPLACE_WITH_REAL_SURFACE_ID",
+      "components": [
+        {
+          "id": "root",
+          "component": "Card",
+          "child": "content",
+          "padding": 12,
+          "cornerRadius": 12
+        },
+        {
+          "id": "content",
+          "component": "Column",
+          "children": [
+            "header",
+            "divider_top",
+            "body",
+            "divider_actions",
+            "actions"
+          ],
+          "align": "stretch",
+          "gap": 8
+        },
+        {
+          "id": "header",
+          "component": "Row",
+          "children": [
+            "title",
+            "status"
+          ],
+          "align": "center",
+          "gap": 8
+        },
+        {
+          "id": "title",
+          "component": "Text",
+          "text": {
+            "path": "/content/title"
+          },
+          "variant": "body",
+          "bold": true,
+          "colorToken": "common_level1_base_color",
+          "maxLine": 2,
+          "weight": 1
+        },
+        {
+          "id": "status",
+          "component": "Tag",
+          "text": {
+            "path": "/content/status"
+          },
+          "theme": "green"
+        },
+        {
+          "id": "divider_top",
+          "component": "Divider",
+          "axis": "horizontal",
+          "borderColorToken": "common_line_light_color"
+        },
+        {
+          "id": "body",
+          "component": "Markdown",
+          "content": {
+            "path": "/content/body"
+          }
+        },
+        {
+          "id": "divider_actions",
+          "component": "Divider",
+          "axis": "horizontal",
+          "borderColorToken": "common_line_light_color"
+        },
+        {
+          "id": "primary_label",
+          "component": "Text",
+          "text": "查看构建结果",
+          "variant": "body"
+        },
+        {
+          "id": "primary_button",
+          "component": "Button",
+          "child": "primary_label",
+          "variant": "primary",
+          "weight": 1,
+          "action": {
+            "event": {
+              "name": "notification_primary",
+              "context": {
+                "bizId": "REPLACE_WITH_BIZ_ID"
+              }
+            }
+          }
+        },
+        {
+          "id": "actions",
+          "component": "Row",
+          "children": [
+            "primary_button"
+          ],
+          "align": "center",
+          "gap": 8
+        }
+      ]
+    }
+  },
+  {
+    "version": "v1.0",
+    "updateDataModel": {
+      "surfaceId": "REPLACE_WITH_REAL_SURFACE_ID",
+      "path": "/",
+      "value": {
+        "content": {
+          "title": "构建已完成",
+          "status": "成功",
+          "body": "`v1.0.62` 已完成构建与基础校验，可以进入灰度验证。"
+        }
+      }
+    }
+  }
+]

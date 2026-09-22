@@ -1,0 +1,44 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "component_column_layout_a2ui",
+      "components": [
+        {
+          "id": "root",
+          "component": "ColumnLayout",
+          "children": [
+            "column_a",
+            "column_b",
+            "column_c"
+          ],
+          "columns": 3,
+          "gap": 12,
+          "columnWidths": [
+            1,
+            1.4,
+            1
+          ],
+          "contentAlignment": "center",
+          "responsive": true,
+          "responsiveColumns": 1
+        },
+        {
+          "id": "column_a",
+          "component": "Text",
+          "text": "Requirement"
+        },
+        {
+          "id": "column_b",
+          "component": "Text",
+          "text": "Design"
+        },
+        {
+          "id": "column_c",
+          "component": "Text",
+          "text": "Delivery"
+        }
+      ]
+    }
+  }
+]

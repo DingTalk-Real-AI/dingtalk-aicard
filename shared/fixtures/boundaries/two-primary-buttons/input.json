@@ -1,0 +1,5 @@
+[{"version":"v1.0","updateComponents":{"surfaceId":"s","components":[
+ {"id":"root","component":"Row","children":["a","b"]},
+ {"id":"la","component":"Text","text":"确定"},{"id":"lb","component":"Text","text":"提交"},
+ {"id":"a","component":"Button","child":"la","variant":"primary","action":{"event":{"name":"x"}}},
+ {"id":"b","component":"Button","child":"lb","variant":"primary","action":{"event":{"name":"y"}}}]}}]

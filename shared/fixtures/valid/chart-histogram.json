@@ -1,0 +1,41 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "component_chart_a2ui",
+      "components": [
+        {
+          "id": "root",
+          "component": "Chart",
+          "data": {
+            "type": "histogram",
+            "data": [
+              {
+                "x": "Jan",
+                "type": "Add",
+                "y": 120
+              },
+              {
+                "x": "Jan",
+                "type": "Churned",
+                "y": 30
+              },
+              {
+                "x": "Feb",
+                "type": "Add",
+                "y": 150
+              },
+              {
+                "x": "Feb",
+                "type": "Churned",
+                "y": 25
+              }
+            ],
+            "config": {}
+          },
+          "aspectRatio": "4:3"
+        }
+      ]
+    }
+  }
+]

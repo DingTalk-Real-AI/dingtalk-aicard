@@ -1,0 +1,251 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "REPLACE_WITH_REAL_SURFACE_ID",
+      "components": [
+        {
+          "id": "root",
+          "component": "Card",
+          "child": "content",
+          "padding": 0,
+          "cornerRadius": 12
+        },
+        {
+          "id": "content",
+          "component": "Column",
+          "children": [
+            "header",
+            "compact_body"
+          ],
+          "align": "stretch",
+          "gap": 0
+        },
+        {
+          "id": "compact_body",
+          "component": "Column",
+          "children": [
+            "subtitle",
+            "facts",
+            "body",
+            "divider_actions",
+            "actions"
+          ],
+          "align": "stretch",
+          "gap": 8,
+          "padding": 8
+        },
+        {
+          "id": "header",
+          "component": "CardHeader",
+          "title": {
+            "path": "/content/title"
+          },
+          "theme": "orange",
+          "trailing": "status",
+          "fallbackMarkdown": "**日程提醒** · 见正文"
+        },
+        {
+          "id": "status",
+          "component": "Tag",
+          "text": {
+            "path": "/content/status"
+          },
+          "theme": "orange"
+        },
+        {
+          "id": "subtitle",
+          "component": "Text",
+          "text": {
+            "path": "/content/subtitle"
+          },
+          "variant": "caption",
+          "colorToken": "common_level2_base_color",
+          "maxLine": 3
+        },
+        {
+          "id": "facts",
+          "component": "Column",
+          "children": [
+            "fact_1",
+            "fact_2",
+            "fact_3"
+          ],
+          "gap": 4
+        },
+        {
+          "id": "fact_1",
+          "component": "Row",
+          "children": [
+            "fact_1_k",
+            "fact_1_v"
+          ],
+          "align": "center",
+          "gap": 8
+        },
+        {
+          "id": "fact_1_k",
+          "component": "Text",
+          "text": "时间",
+          "variant": "caption",
+          "colorToken": "common_level2_base_color",
+          "maxLine": 1
+        },
+        {
+          "id": "fact_1_v",
+          "component": "Text",
+          "text": {
+            "path": "/content/facts/time"
+          },
+          "variant": "body",
+          "colorToken": "common_level1_base_color",
+          "maxLine": 2,
+          "weight": 1
+        },
+        {
+          "id": "fact_2",
+          "component": "Row",
+          "children": [
+            "fact_2_k",
+            "fact_2_v"
+          ],
+          "align": "center",
+          "gap": 8
+        },
+        {
+          "id": "fact_2_k",
+          "component": "Text",
+          "text": "地点",
+          "variant": "caption",
+          "colorToken": "common_level2_base_color",
+          "maxLine": 1
+        },
+        {
+          "id": "fact_2_v",
+          "component": "Text",
+          "text": {
+            "path": "/content/facts/location"
+          },
+          "variant": "body",
+          "colorToken": "common_level1_base_color",
+          "maxLine": 2,
+          "weight": 1
+        },
+        {
+          "id": "fact_3",
+          "component": "Row",
+          "children": [
+            "fact_3_k",
+            "fact_3_v"
+          ],
+          "align": "center",
+          "gap": 8
+        },
+        {
+          "id": "fact_3_k",
+          "component": "Text",
+          "text": "参与人",
+          "variant": "caption",
+          "colorToken": "common_level2_base_color",
+          "maxLine": 1
+        },
+        {
+          "id": "fact_3_v",
+          "component": "Text",
+          "text": {
+            "path": "/content/facts/attendees"
+          },
+          "variant": "body",
+          "colorToken": "common_level1_base_color",
+          "maxLine": 2,
+          "weight": 1
+        },
+        {
+          "id": "body",
+          "component": "Markdown",
+          "content": {
+            "path": "/content/body"
+          }
+        },
+        {
+          "id": "divider_actions",
+          "component": "Divider",
+          "axis": "horizontal",
+          "borderColorToken": "common_line_light_color"
+        },
+        {
+          "id": "secondary_label",
+          "component": "Text",
+          "text": "查看日程",
+          "variant": "body"
+        },
+        {
+          "id": "secondary_button",
+          "component": "Button",
+          "child": "secondary_label",
+          "variant": "default",
+          "weight": 1,
+          "action": {
+            "event": {
+              "name": "schedule_secondary",
+              "context": {
+                "bizId": "REPLACE_WITH_BIZ_ID"
+              }
+            }
+          }
+        },
+        {
+          "id": "primary_label",
+          "component": "Text",
+          "text": "接受",
+          "variant": "body"
+        },
+        {
+          "id": "primary_button",
+          "component": "Button",
+          "child": "primary_label",
+          "variant": "primary",
+          "weight": 1,
+          "action": {
+            "event": {
+              "name": "schedule_primary",
+              "context": {
+                "bizId": "REPLACE_WITH_BIZ_ID"
+              }
+            }
+          }
+        },
+        {
+          "id": "actions",
+          "component": "Row",
+          "children": [
+            "secondary_button",
+            "primary_button"
+          ],
+          "align": "center",
+          "gap": 8
+        }
+      ]
+    }
+  },
+  {
+    "version": "v1.0",
+    "updateDataModel": {
+      "surfaceId": "REPLACE_WITH_REAL_SURFACE_ID",
+      "path": "/",
+      "value": {
+        "content": {
+          "title": "日程冲突提醒",
+          "subtitle": "今天 15:00–16:00 与「季度复盘」重叠",
+          "status": "待确认",
+          "facts": {
+            "time": "今天 15:00–16:00",
+            "location": "3F-会议室B / 线上",
+            "attendees": "王五、赵六 等 5 人"
+          },
+          "body": "两场会议时间重叠，请确认保留哪一场；未确认将默认保留先创建的。"
+        }
+      }
+    }
+  }
+]

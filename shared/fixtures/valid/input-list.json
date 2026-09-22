@@ -1,0 +1,50 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "component_input_list_a2ui",
+      "components": [
+        {
+          "id": "root",
+          "component": "InputList",
+          "label": {
+            "path": "/inputList/label"
+          },
+          "value": {
+            "path": "/inputList/value"
+          },
+          "placeholder": "Enter content",
+          "addLabel": "Add row",
+          "variant": "shortText",
+          "disabled": false,
+          "action": {
+            "event": {
+              "name": "input_list_updated",
+              "context": {
+                "value": {
+                  "path": "/inputList/value"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  {
+    "version": "v1.0",
+    "updateDataModel": {
+      "surfaceId": "component_input_list_a2ui",
+      "path": "/",
+      "value": {
+        "inputList": {
+          "label": "Requirement list",
+          "value": [
+            "Requirements",
+            "Visual design"
+          ]
+        }
+      }
+    }
+  }
+]

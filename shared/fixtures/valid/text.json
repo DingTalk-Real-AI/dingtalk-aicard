@@ -1,0 +1,45 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "component_text_a2ui",
+      "components": [
+        {
+          "id": "root",
+          "component": "Text",
+          "text": {
+            "path": "/data/text/content"
+          },
+          "variant": "body",
+          "bold": true,
+          "maxLine": 3,
+          "onLinkClick": {
+            "functionCall": {
+              "call": "openUrl",
+              "args": {
+                "url": {
+                  "path": "/data/text/linkUrl"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  {
+    "version": "v1.0",
+    "updateDataModel": {
+      "surfaceId": "component_text_a2ui",
+      "path": "/",
+      "value": {
+        "data": {
+          "text": {
+            "content": "Sample text supporting the streaming typewriter effect, a leading icon and multiple font sizes.",
+            "linkUrl": "https://www.dingtalk.com/"
+          }
+        }
+      }
+    }
+  }
+]

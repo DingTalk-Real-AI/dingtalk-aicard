@@ -1,0 +1,62 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "component_file_a2ui",
+      "components": [
+        {
+          "id": "root",
+          "component": "File",
+          "fileName": {
+            "path": "/file/name"
+          },
+          "url": {
+            "path": "/file/url"
+          },
+          "mimeType": {
+            "path": "/file/mimeType"
+          },
+          "size": {
+            "path": "/file/size"
+          },
+          "description": {
+            "path": "/file/description"
+          },
+          "previewUrl": {
+            "path": "/file/previewUrl"
+          },
+          "onPreview": {
+            "event": {
+              "name": "file_preview_requested",
+              "context": {
+                "fileName": {
+                  "path": "/file/name"
+                },
+                "url": {
+                  "path": "/file/url"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  {
+    "version": "v1.0",
+    "updateDataModel": {
+      "surfaceId": "component_file_a2ui",
+      "path": "/",
+      "value": {
+        "file": {
+          "name": "competitive-analysis.md",
+          "url": "dingtalk-card-components-a2ui.md",
+          "mimeType": "text/markdown",
+          "size": 24576,
+          "description": "AI-generated competitive analysis",
+          "previewUrl": "dingtalk-card-components-a2ui.md"
+        }
+      }
+    }
+  }
+]

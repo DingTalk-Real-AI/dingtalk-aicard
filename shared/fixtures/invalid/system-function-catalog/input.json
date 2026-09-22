@@ -1,0 +1,4 @@
+[{"version":"v1.0","updateComponents":{"surfaceId":"s","components":[
+ {"id":"root","component":"Loop","children":{"componentId":"item","path":"/items"}},
+ {"id":"item","component":"Text","text":{"call":"@index","catalogId":"x","args":{}}}]}},
+ {"version":"v1.0","updateDataModel":{"surfaceId":"s","path":"/","value":{"items":[{}]}}}]

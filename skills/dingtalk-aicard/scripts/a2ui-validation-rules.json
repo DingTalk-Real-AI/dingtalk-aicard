@@ -1,0 +1,711 @@
+{
+  "version": 1,
+  "definitions": {
+    "common-types-extended.json": {
+      "ValueFunctionCall": {
+        "allOf": [
+          {
+            "$ref": "./common-types-basic.json#/$defs/FunctionCommon"
+          },
+          {
+            "oneOf": [
+              {
+                "$ref": "./catalog-functions-core.json#/functions/required"
+              },
+              {
+                "$ref": "./catalog-functions-core.json#/functions/regex"
+              },
+              {
+                "$ref": "./catalog-functions-core.json#/functions/length"
+              },
+              {
+                "$ref": "./catalog-functions-core.json#/functions/numeric"
+              },
+              {
+                "$ref": "./catalog-functions-core.json#/functions/email"
+              },
+              {
+                "$ref": "./catalog-functions-core.json#/functions/formatString"
+              },
+              {
+                "$ref": "./catalog-functions-core.json#/functions/formatNumber"
+              },
+              {
+                "$ref": "./catalog-functions-core.json#/functions/formatCurrency"
+              },
+              {
+                "$ref": "./catalog-functions-core.json#/functions/formatDate"
+              },
+              {
+                "$ref": "./catalog-functions-core.json#/functions/pluralize"
+              },
+              {
+                "$ref": "./catalog-functions-core.json#/functions/and"
+              },
+              {
+                "$ref": "./catalog-functions-core.json#/functions/or"
+              },
+              {
+                "$ref": "./catalog-functions-core.json#/functions/not"
+              },
+              {
+                "$ref": "./catalog-functions-expressions.json#/functions/add"
+              },
+              {
+                "$ref": "./catalog-functions-expressions.json#/functions/sub"
+              },
+              {
+                "$ref": "./catalog-functions-expressions.json#/functions/mul"
+              },
+              {
+                "$ref": "./catalog-functions-expressions.json#/functions/div"
+              },
+              {
+                "$ref": "./catalog-functions-expressions.json#/functions/mod"
+              },
+              {
+                "$ref": "./catalog-functions-expressions.json#/functions/eq"
+              },
+              {
+                "$ref": "./catalog-functions-expressions.json#/functions/ne"
+              },
+              {
+                "$ref": "./catalog-functions-expressions.json#/functions/lt"
+              },
+              {
+                "$ref": "./catalog-functions-expressions.json#/functions/lte"
+              },
+              {
+                "$ref": "./catalog-functions-expressions.json#/functions/gt"
+              },
+              {
+                "$ref": "./catalog-functions-expressions.json#/functions/gte"
+              },
+              {
+                "$ref": "./catalog-functions-expressions.json#/functions/cond"
+              },
+              {
+                "$ref": "./catalog-functions-expressions.json#/functions/toDouble"
+              },
+              {
+                "$ref": "./catalog-functions-expressions.json#/functions/toLong"
+              },
+              {
+                "$ref": "./catalog-functions-expressions.json#/functions/objectGet"
+              },
+              {
+                "$ref": "./catalog-functions-expressions.json#/functions/arrayGet"
+              },
+              {
+                "$ref": "./catalog-functions-expressions.json#/functions/arrayFind"
+              },
+              {
+                "$ref": "./catalog-functions-expressions.json#/functions/getLength"
+              },
+              {
+                "$ref": "./common-types-basic.json#/$defs/IndexSystemFunction"
+              }
+            ]
+          }
+        ],
+        "unevaluatedProperties": false
+      },
+      "ActionFunctionCall": {
+        "allOf": [
+          {
+            "$ref": "./common-types-basic.json#/$defs/FunctionCommon"
+          },
+          {
+            "oneOf": [
+              {
+                "$ref": "./catalog-functions-core.json#/functions/openUrl"
+              },
+              {
+                "$ref": "./catalog-functions-host-actions.json#/functions/copyText"
+              },
+              {
+                "$ref": "./catalog-functions-host-actions.json#/functions/openChat"
+              },
+              {
+                "$ref": "./catalog-functions-host-actions.json#/functions/previewImages"
+              },
+              {
+                "$ref": "./catalog-functions-host-actions.json#/functions/previewVideo"
+              },
+              {
+                "$ref": "./catalog-functions-host-actions.json#/functions/promptText"
+              },
+              {
+                "$ref": "./catalog-functions-host-actions.json#/functions/showConfirm"
+              },
+              {
+                "$ref": "./catalog-functions-host-actions.json#/functions/showModal"
+              }
+            ]
+          }
+        ],
+        "unevaluatedProperties": false
+      },
+      "EventAction": {
+        "$ref": "./common-types-basic.json#/$defs/Action",
+        "type": "object",
+        "required": [
+          "event"
+        ]
+      },
+      "ComponentMetadata": {
+        "description": "Extension metadata. For host actions, validate the corresponding result write-back slot; pass through unused content.",
+        "properties": {
+          "extensions": {
+            "properties": {
+              "dt_actionBindingsV1": {
+                "description": "Result write-back bindings keyed by action property, for example action: {resultPath: /ui/result}. An active slot must satisfy HostActionBinding; other slots are ignored."
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "references": [
+    {
+      "file": "common-types-basic.json",
+      "path": [
+        "$defs",
+        "ComponentCommon",
+        "properties",
+        "metadata"
+      ],
+      "publicRef": null,
+      "validationRef": "./common-types-extended.json#/$defs/ComponentMetadata"
+    },
+    {
+      "file": "common-types-basic.json",
+      "path": [
+        "$defs",
+        "DynamicValue",
+        "oneOf",
+        7
+      ],
+      "publicRef": "./common-types-basic.json#/$defs/FunctionCall",
+      "validationRef": "./common-types-extended.json#/$defs/ValueFunctionCall"
+    },
+    {
+      "file": "common-types-basic.json",
+      "path": [
+        "$defs",
+        "DynamicString",
+        "oneOf",
+        2
+      ],
+      "publicRef": "./common-types-basic.json#/$defs/FunctionCall",
+      "validationRef": "./common-types-extended.json#/$defs/ValueFunctionCall"
+    },
+    {
+      "file": "common-types-basic.json",
+      "path": [
+        "$defs",
+        "DynamicNumber",
+        "oneOf",
+        2
+      ],
+      "publicRef": "./common-types-basic.json#/$defs/FunctionCall",
+      "validationRef": "./common-types-extended.json#/$defs/ValueFunctionCall"
+    },
+    {
+      "file": "common-types-basic.json",
+      "path": [
+        "$defs",
+        "DynamicBoolean",
+        "oneOf",
+        2
+      ],
+      "publicRef": "./common-types-basic.json#/$defs/FunctionCall",
+      "validationRef": "./common-types-extended.json#/$defs/ValueFunctionCall"
+    },
+    {
+      "file": "common-types-basic.json",
+      "path": [
+        "$defs",
+        "DynamicStringList",
+        "oneOf",
+        2
+      ],
+      "publicRef": "./common-types-basic.json#/$defs/FunctionCall",
+      "validationRef": "./common-types-extended.json#/$defs/ValueFunctionCall"
+    },
+    {
+      "file": "common-types-basic.json",
+      "path": [
+        "$defs",
+        "Action",
+        "oneOf",
+        1,
+        "properties",
+        "functionCall"
+      ],
+      "publicRef": "./common-types-basic.json#/$defs/FunctionCall",
+      "validationRef": "./common-types-extended.json#/$defs/ActionFunctionCall"
+    },
+    {
+      "file": "catalog-components-common.json",
+      "path": [
+        "components",
+        "Icon",
+        "properties",
+        "name",
+        "anyOf",
+        2
+      ],
+      "publicRef": "./common-types-basic.json#/$defs/FunctionCall",
+      "validationRef": "./common-types-extended.json#/$defs/ValueFunctionCall"
+    },
+    {
+      "file": "catalog-components-composition.json",
+      "path": [
+        "components",
+        "CardHeader",
+        "properties",
+        "theme",
+        "anyOf",
+        2
+      ],
+      "publicRef": "./common-types-basic.json#/$defs/FunctionCall",
+      "validationRef": "./common-types-extended.json#/$defs/ValueFunctionCall"
+    },
+    {
+      "file": "catalog-components-composition.json",
+      "path": [
+        "components",
+        "Tabs",
+        "properties",
+        "tabs",
+        "items",
+        "properties",
+        "action"
+      ],
+      "publicRef": "./common-types-basic.json#/$defs/Action",
+      "validationRef": "./common-types-extended.json#/$defs/EventAction"
+    },
+    {
+      "file": "catalog-components-composition.json",
+      "path": [
+        "components",
+        "ButtonGroup",
+        "properties",
+        "buttons",
+        "items",
+        "properties",
+        "metadata"
+      ],
+      "publicRef": null,
+      "validationRef": "./common-types-extended.json#/$defs/ComponentMetadata"
+    },
+    {
+      "file": "catalog-components-inputs.json",
+      "path": [
+        "components",
+        "CheckBox",
+        "properties",
+        "action"
+      ],
+      "publicRef": "./common-types-basic.json#/$defs/Action",
+      "validationRef": "./common-types-extended.json#/$defs/EventAction"
+    },
+    {
+      "file": "catalog-components-inputs.json",
+      "path": [
+        "components",
+        "Switch",
+        "properties",
+        "action"
+      ],
+      "publicRef": "./common-types-basic.json#/$defs/Action",
+      "validationRef": "./common-types-extended.json#/$defs/EventAction"
+    },
+    {
+      "file": "catalog-components-inputs.json",
+      "path": [
+        "components",
+        "NumberInput",
+        "properties",
+        "action"
+      ],
+      "publicRef": "./common-types-basic.json#/$defs/Action",
+      "validationRef": "./common-types-extended.json#/$defs/EventAction"
+    },
+    {
+      "file": "catalog-components-inputs.json",
+      "path": [
+        "components",
+        "Rating",
+        "properties",
+        "onTap"
+      ],
+      "publicRef": "./common-types-basic.json#/$defs/Action",
+      "validationRef": "./common-types-extended.json#/$defs/EventAction"
+    },
+    {
+      "file": "catalog-components-inputs.json",
+      "path": [
+        "components",
+        "InputList",
+        "properties",
+        "action"
+      ],
+      "publicRef": "./common-types-basic.json#/$defs/Action",
+      "validationRef": "./common-types-extended.json#/$defs/EventAction"
+    },
+    {
+      "file": "catalog-components-inputs.json",
+      "path": [
+        "components",
+        "CheckboxListMulti",
+        "properties",
+        "action"
+      ],
+      "publicRef": "./common-types-basic.json#/$defs/Action",
+      "validationRef": "./common-types-extended.json#/$defs/EventAction"
+    },
+    {
+      "file": "catalog-functions-host-actions.json",
+      "path": [
+        "functions",
+        "copyText",
+        "properties",
+        "args",
+        "properties",
+        "text",
+        "anyOf",
+        2
+      ],
+      "publicRef": "./common-types-basic.json#/$defs/FunctionCall",
+      "validationRef": "./common-types-extended.json#/$defs/ValueFunctionCall"
+    },
+    {
+      "file": "catalog-functions-host-actions.json",
+      "path": [
+        "functions",
+        "openChat",
+        "properties",
+        "args",
+        "properties",
+        "openConversationId",
+        "anyOf",
+        2
+      ],
+      "publicRef": "./common-types-basic.json#/$defs/FunctionCall",
+      "validationRef": "./common-types-extended.json#/$defs/ValueFunctionCall"
+    },
+    {
+      "file": "catalog-functions-host-actions.json",
+      "path": [
+        "functions",
+        "previewImages",
+        "properties",
+        "args",
+        "properties",
+        "current",
+        "anyOf",
+        2
+      ],
+      "publicRef": "./common-types-basic.json#/$defs/FunctionCall",
+      "validationRef": "./common-types-extended.json#/$defs/ValueFunctionCall"
+    },
+    {
+      "file": "catalog-functions-host-actions.json",
+      "path": [
+        "functions",
+        "previewImages",
+        "properties",
+        "args",
+        "properties",
+        "urls",
+        "anyOf",
+        0,
+        "items",
+        "anyOf",
+        2
+      ],
+      "publicRef": "./common-types-basic.json#/$defs/FunctionCall",
+      "validationRef": "./common-types-extended.json#/$defs/ValueFunctionCall"
+    },
+    {
+      "file": "catalog-functions-host-actions.json",
+      "path": [
+        "functions",
+        "previewImages",
+        "properties",
+        "args",
+        "properties",
+        "urls",
+        "anyOf",
+        2
+      ],
+      "publicRef": "./common-types-basic.json#/$defs/FunctionCall",
+      "validationRef": "./common-types-extended.json#/$defs/ValueFunctionCall"
+    },
+    {
+      "file": "catalog-functions-host-actions.json",
+      "path": [
+        "functions",
+        "previewImages",
+        "properties",
+        "args",
+        "allOf",
+        0,
+        "then",
+        "properties",
+        "urls",
+        "anyOf",
+        2,
+        "allOf",
+        0
+      ],
+      "publicRef": "./common-types-basic.json#/$defs/FunctionCall",
+      "validationRef": "./common-types-extended.json#/$defs/ValueFunctionCall"
+    },
+    {
+      "file": "catalog-functions-host-actions.json",
+      "path": [
+        "functions",
+        "previewVideo",
+        "properties",
+        "args",
+        "properties",
+        "posterUrl",
+        "anyOf",
+        2
+      ],
+      "publicRef": "./common-types-basic.json#/$defs/FunctionCall",
+      "validationRef": "./common-types-extended.json#/$defs/ValueFunctionCall"
+    },
+    {
+      "file": "catalog-functions-host-actions.json",
+      "path": [
+        "functions",
+        "previewVideo",
+        "properties",
+        "args",
+        "properties",
+        "url",
+        "anyOf",
+        2
+      ],
+      "publicRef": "./common-types-basic.json#/$defs/FunctionCall",
+      "validationRef": "./common-types-extended.json#/$defs/ValueFunctionCall"
+    },
+    {
+      "file": "catalog-functions-host-actions.json",
+      "path": [
+        "functions",
+        "promptText",
+        "properties",
+        "args",
+        "properties",
+        "initialValue",
+        "anyOf",
+        2
+      ],
+      "publicRef": "./common-types-basic.json#/$defs/FunctionCall",
+      "validationRef": "./common-types-extended.json#/$defs/ValueFunctionCall"
+    },
+    {
+      "file": "catalog-functions-host-actions.json",
+      "path": [
+        "functions",
+        "promptText",
+        "properties",
+        "args",
+        "properties",
+        "message",
+        "anyOf",
+        2
+      ],
+      "publicRef": "./common-types-basic.json#/$defs/FunctionCall",
+      "validationRef": "./common-types-extended.json#/$defs/ValueFunctionCall"
+    },
+    {
+      "file": "catalog-functions-host-actions.json",
+      "path": [
+        "functions",
+        "promptText",
+        "properties",
+        "args",
+        "properties",
+        "title",
+        "anyOf",
+        2
+      ],
+      "publicRef": "./common-types-basic.json#/$defs/FunctionCall",
+      "validationRef": "./common-types-extended.json#/$defs/ValueFunctionCall"
+    },
+    {
+      "file": "catalog-functions-host-actions.json",
+      "path": [
+        "functions",
+        "showConfirm",
+        "properties",
+        "args",
+        "properties",
+        "cancelText",
+        "anyOf",
+        2
+      ],
+      "publicRef": "./common-types-basic.json#/$defs/FunctionCall",
+      "validationRef": "./common-types-extended.json#/$defs/ValueFunctionCall"
+    },
+    {
+      "file": "catalog-functions-host-actions.json",
+      "path": [
+        "functions",
+        "showConfirm",
+        "properties",
+        "args",
+        "properties",
+        "confirmText",
+        "anyOf",
+        2
+      ],
+      "publicRef": "./common-types-basic.json#/$defs/FunctionCall",
+      "validationRef": "./common-types-extended.json#/$defs/ValueFunctionCall"
+    },
+    {
+      "file": "catalog-functions-host-actions.json",
+      "path": [
+        "functions",
+        "showConfirm",
+        "properties",
+        "args",
+        "properties",
+        "message",
+        "anyOf",
+        2
+      ],
+      "publicRef": "./common-types-basic.json#/$defs/FunctionCall",
+      "validationRef": "./common-types-extended.json#/$defs/ValueFunctionCall"
+    },
+    {
+      "file": "catalog-functions-host-actions.json",
+      "path": [
+        "functions",
+        "showConfirm",
+        "properties",
+        "args",
+        "properties",
+        "title",
+        "anyOf",
+        2
+      ],
+      "publicRef": "./common-types-basic.json#/$defs/FunctionCall",
+      "validationRef": "./common-types-extended.json#/$defs/ValueFunctionCall"
+    },
+    {
+      "file": "catalog-functions-host-actions.json",
+      "path": [
+        "functions",
+        "showModal",
+        "properties",
+        "args",
+        "properties",
+        "buttons",
+        "anyOf",
+        0,
+        "items",
+        "anyOf",
+        0,
+        "properties",
+        "id",
+        "anyOf",
+        2
+      ],
+      "publicRef": "./common-types-basic.json#/$defs/FunctionCall",
+      "validationRef": "./common-types-extended.json#/$defs/ValueFunctionCall"
+    },
+    {
+      "file": "catalog-functions-host-actions.json",
+      "path": [
+        "functions",
+        "showModal",
+        "properties",
+        "args",
+        "properties",
+        "buttons",
+        "anyOf",
+        0,
+        "items",
+        "anyOf",
+        0,
+        "properties",
+        "title",
+        "anyOf",
+        2
+      ],
+      "publicRef": "./common-types-basic.json#/$defs/FunctionCall",
+      "validationRef": "./common-types-extended.json#/$defs/ValueFunctionCall"
+    },
+    {
+      "file": "catalog-functions-host-actions.json",
+      "path": [
+        "functions",
+        "showModal",
+        "properties",
+        "args",
+        "properties",
+        "buttons",
+        "anyOf",
+        0,
+        "items",
+        "anyOf",
+        2
+      ],
+      "publicRef": "./common-types-basic.json#/$defs/FunctionCall",
+      "validationRef": "./common-types-extended.json#/$defs/ValueFunctionCall"
+    },
+    {
+      "file": "catalog-functions-host-actions.json",
+      "path": [
+        "functions",
+        "showModal",
+        "properties",
+        "args",
+        "properties",
+        "buttons",
+        "anyOf",
+        2
+      ],
+      "publicRef": "./common-types-basic.json#/$defs/FunctionCall",
+      "validationRef": "./common-types-extended.json#/$defs/ValueFunctionCall"
+    },
+    {
+      "file": "catalog-functions-host-actions.json",
+      "path": [
+        "functions",
+        "showModal",
+        "properties",
+        "args",
+        "properties",
+        "message",
+        "anyOf",
+        2
+      ],
+      "publicRef": "./common-types-basic.json#/$defs/FunctionCall",
+      "validationRef": "./common-types-extended.json#/$defs/ValueFunctionCall"
+    },
+    {
+      "file": "catalog-functions-host-actions.json",
+      "path": [
+        "functions",
+        "showModal",
+        "properties",
+        "args",
+        "properties",
+        "title",
+        "anyOf",
+        2
+      ],
+      "publicRef": "./common-types-basic.json#/$defs/FunctionCall",
+      "validationRef": "./common-types-extended.json#/$defs/ValueFunctionCall"
+    }
+  ]
+}

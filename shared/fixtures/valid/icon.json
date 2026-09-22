@@ -1,0 +1,15 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "component_icon_a2ui",
+      "components": [
+        {
+          "id": "root",
+          "component": "Icon",
+          "name": "Search_L_outlined"
+        }
+      ]
+    }
+  }
+]

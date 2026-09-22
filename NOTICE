@@ -1,0 +1,16 @@
+DingTalk AI Card V0.8
+Copyright 2026 Alibaba Group (repository-authored material, except where noted)
+
+This repository is distributed under the Apache License, Version 2.0, in
+LICENSE. Existing file-level and package notices identify their respective
+rights holders; this repository notice does not replace those attributions.
+
+Parts of the protocol in spec/ retain or adapt material from the A2UI 1.0
+reference. See spec/NOTICE for the pinned upstream revision, per-file
+modifications, and attribution, and spec/LICENSE for the included license.
+The generated protocol copies in both Skills retain that license and notice.
+
+This project is maintained by DingTalk. It is not published or endorsed by
+the A2UI project. Apache-2.0 grants no trademark rights; references to A2UI
+identify the upstream work. The protocol's compatibility boundaries are in
+spec/README.md, and generated copies are not independent protocol sources.

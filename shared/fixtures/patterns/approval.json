@@ -1,0 +1,315 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "REPLACE_WITH_REAL_SURFACE_ID",
+      "components": [
+        {
+          "id": "root",
+          "component": "Card",
+          "child": "content",
+          "padding": 12,
+          "cornerRadius": 12
+        },
+        {
+          "id": "content",
+          "component": "Column",
+          "children": [
+            "header",
+            "subtitle",
+            "divider_top",
+            "facts",
+            "body",
+            "decision_title",
+            "choice",
+            "comment",
+            "divider_actions",
+            "actions"
+          ],
+          "align": "stretch",
+          "gap": 8
+        },
+        {
+          "id": "header",
+          "component": "Row",
+          "children": [
+            "title",
+            "status"
+          ],
+          "align": "center",
+          "gap": 8
+        },
+        {
+          "id": "title",
+          "component": "Text",
+          "text": {
+            "path": "/content/title"
+          },
+          "variant": "body",
+          "bold": true,
+          "colorToken": "common_level1_base_color",
+          "maxLine": 2,
+          "weight": 1
+        },
+        {
+          "id": "status",
+          "component": "Tag",
+          "text": {
+            "path": "/content/status"
+          },
+          "theme": "orange"
+        },
+        {
+          "id": "subtitle",
+          "component": "Text",
+          "text": {
+            "path": "/content/subtitle"
+          },
+          "variant": "caption",
+          "colorToken": "common_level2_base_color",
+          "maxLine": 3
+        },
+        {
+          "id": "divider_top",
+          "component": "Divider",
+          "axis": "horizontal",
+          "borderColorToken": "common_line_light_color"
+        },
+        {
+          "id": "facts",
+          "component": "Column",
+          "children": [
+            "fact_1",
+            "fact_2",
+            "fact_3"
+          ],
+          "gap": 4
+        },
+        {
+          "id": "fact_1",
+          "component": "Row",
+          "children": [
+            "fact_1_k",
+            "fact_1_v"
+          ],
+          "align": "center",
+          "gap": 8
+        },
+        {
+          "id": "fact_1_k",
+          "component": "Text",
+          "text": "申请人",
+          "variant": "caption",
+          "colorToken": "common_level2_base_color",
+          "maxLine": 1
+        },
+        {
+          "id": "fact_1_v",
+          "component": "Text",
+          "text": {
+            "path": "/content/facts/applicant"
+          },
+          "variant": "body",
+          "colorToken": "common_level1_base_color",
+          "maxLine": 2,
+          "weight": 1
+        },
+        {
+          "id": "fact_2",
+          "component": "Row",
+          "children": [
+            "fact_2_k",
+            "fact_2_v"
+          ],
+          "align": "center",
+          "gap": 8
+        },
+        {
+          "id": "fact_2_k",
+          "component": "Text",
+          "text": "金额",
+          "variant": "caption",
+          "colorToken": "common_level2_base_color",
+          "maxLine": 1
+        },
+        {
+          "id": "fact_2_v",
+          "component": "Text",
+          "text": {
+            "path": "/content/facts/amount"
+          },
+          "variant": "body",
+          "colorToken": "common_level1_base_color",
+          "maxLine": 2,
+          "weight": 1
+        },
+        {
+          "id": "fact_3",
+          "component": "Row",
+          "children": [
+            "fact_3_k",
+            "fact_3_v"
+          ],
+          "align": "center",
+          "gap": 8
+        },
+        {
+          "id": "fact_3_k",
+          "component": "Text",
+          "text": "期望完成",
+          "variant": "caption",
+          "colorToken": "common_level2_base_color",
+          "maxLine": 1
+        },
+        {
+          "id": "fact_3_v",
+          "component": "Text",
+          "text": {
+            "path": "/content/facts/deadline"
+          },
+          "variant": "body",
+          "colorToken": "common_level1_base_color",
+          "maxLine": 2,
+          "weight": 1
+        },
+        {
+          "id": "body",
+          "component": "Markdown",
+          "content": {
+            "path": "/content/body"
+          }
+        },
+        {
+          "id": "decision_title",
+          "component": "Text",
+          "text": "审批决定",
+          "variant": "body",
+          "bold": true,
+          "colorToken": "common_level1_base_color"
+        },
+        {
+          "id": "choice",
+          "component": "ChoicePicker",
+          "label": "处理结果",
+          "variant": "mutuallyExclusive",
+          "displayStyle": "checkbox",
+          "options": [
+            {
+              "label": "同意",
+              "value": "approve"
+            },
+            {
+              "label": "需要修改",
+              "value": "revise"
+            },
+            {
+              "label": "拒绝",
+              "value": "reject"
+            }
+          ],
+          "value": {
+            "path": "/form/choice"
+          }
+        },
+        {
+          "id": "comment",
+          "component": "TextField",
+          "label": "审批意见（选填）",
+          "value": {
+            "path": "/form/comment"
+          },
+          "placeholder": "补充判断依据或修改建议",
+          "variant": "longText"
+        },
+        {
+          "id": "divider_actions",
+          "component": "Divider",
+          "axis": "horizontal",
+          "borderColorToken": "common_line_light_color"
+        },
+        {
+          "id": "secondary_label",
+          "component": "Text",
+          "text": "退回申请人",
+          "variant": "body"
+        },
+        {
+          "id": "secondary_button",
+          "component": "Button",
+          "child": "secondary_label",
+          "variant": "default",
+          "weight": 1,
+          "action": {
+            "event": {
+              "name": "approval_secondary",
+              "context": {
+                "bizId": "REPLACE_WITH_BIZ_ID",
+                "form": {
+                  "path": "/form"
+                }
+              }
+            }
+          }
+        },
+        {
+          "id": "primary_label",
+          "component": "Text",
+          "text": "提交审批",
+          "variant": "body"
+        },
+        {
+          "id": "primary_button",
+          "component": "Button",
+          "child": "primary_label",
+          "variant": "primary",
+          "weight": 1,
+          "action": {
+            "event": {
+              "name": "approval_primary",
+              "context": {
+                "bizId": "REPLACE_WITH_BIZ_ID",
+                "form": {
+                  "path": "/form"
+                }
+              }
+            }
+          }
+        },
+        {
+          "id": "actions",
+          "component": "Row",
+          "children": [
+            "secondary_button",
+            "primary_button"
+          ],
+          "align": "center",
+          "gap": 8
+        }
+      ]
+    }
+  },
+  {
+    "version": "v1.0",
+    "updateDataModel": {
+      "surfaceId": "REPLACE_WITH_REAL_SURFACE_ID",
+      "path": "/",
+      "value": {
+        "content": {
+          "title": "发布方案审批",
+          "subtitle": "来自 前端平台组 · 刚刚",
+          "status": "待确认",
+          "facts": {
+            "applicant": "张三",
+            "amount": "¥ 12,000",
+            "deadline": "9 月 30 日"
+          },
+          "body": "本次发布包含登录页重构与埋点升级，已完成灰度验证。"
+        },
+        "form": {
+          "choice": [],
+          "comment": ""
+        }
+      }
+    }
+  }
+]

@@ -1,0 +1,58 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "REPLACE_WITH_REAL_SURFACE_ID",
+      "components": [
+        {
+          "id": "root",
+          "component": "Card",
+          "child": "content",
+          "padding": 12,
+          "cornerRadius": 12
+        },
+        {
+          "id": "content",
+          "component": "Column",
+          "children": [
+            "title",
+            "body"
+          ],
+          "align": "stretch",
+          "gap": 8
+        },
+        {
+          "id": "title",
+          "component": "Text",
+          "text": {
+            "path": "/content/title"
+          },
+          "variant": "body",
+          "bold": true,
+          "colorToken": "common_level1_base_color",
+          "maxLine": 2
+        },
+        {
+          "id": "body",
+          "component": "Markdown",
+          "content": {
+            "path": "/content/body"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "version": "v1.0",
+    "updateDataModel": {
+      "surfaceId": "REPLACE_WITH_REAL_SURFACE_ID",
+      "path": "/",
+      "value": {
+        "content": {
+          "title": "REPLACE_WITH_TITLE",
+          "body": "REPLACE_WITH_BODY"
+        }
+      }
+    }
+  }
+]

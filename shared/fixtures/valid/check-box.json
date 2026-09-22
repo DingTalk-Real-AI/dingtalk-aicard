@@ -1,0 +1,36 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "component_check_box_a2ui",
+      "components": [
+        {
+          "id": "root",
+          "component": "CheckBox",
+          "label": "Receive notifications",
+          "value": {
+            "path": "/form/notify"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "version": "v1.0",
+    "updateDataModel": {
+      "surfaceId": "component_check_box_a2ui",
+      "path": "/",
+      "value": {
+        "form": {
+          "name": "Protocol adaptation",
+          "notify": true,
+          "priority": [
+            "high"
+          ],
+          "deadline": "2026-08-31T18:00:00+08:00",
+          "progress": 68
+        }
+      }
+    }
+  }
+]

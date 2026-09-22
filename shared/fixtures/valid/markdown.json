@@ -1,0 +1,31 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "component_markdown_a2ui",
+      "components": [
+        {
+          "id": "root",
+          "component": "Markdown",
+          "content": {
+            "path": "/data/markdown/content"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "version": "v1.0",
+    "updateDataModel": {
+      "surfaceId": "component_markdown_a2ui",
+      "path": "/",
+      "value": {
+        "data": {
+          "markdown": {
+            "content": "## Heading\n\n- Item 1\n- Item 2\n\n**bold** *italic* ~~strikethrough~~\n\n<a atId=\"DUTM8iiZsQVR2uGmScltomjAiEiE\">Alice</a> <a atId=\"all\">everyone</a> please review\n\n[Link](https://open.dingtalk.com)\n\n```python\nprint('hello')\n```"
+          }
+        }
+      }
+    }
+  }
+]

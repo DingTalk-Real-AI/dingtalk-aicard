@@ -1,0 +1,46 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "component_column_a2ui",
+      "components": [
+        {
+          "id": "root",
+          "component": "Column",
+          "children": [
+            "title",
+            "body"
+          ],
+          "align": "stretch"
+        },
+        {
+          "id": "title",
+          "component": "Text",
+          "text": {
+            "path": "/column/title"
+          }
+        },
+        {
+          "id": "body",
+          "component": "Text",
+          "text": {
+            "path": "/column/body"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "version": "v1.0",
+    "updateDataModel": {
+      "surfaceId": "component_column_a2ui",
+      "path": "/",
+      "value": {
+        "column": {
+          "title": "Title",
+          "body": "Vertical content"
+        }
+      }
+    }
+  }
+]

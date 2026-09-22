@@ -1,0 +1,36 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "component_image_carousel_a2ui",
+      "components": [
+        {
+          "id": "root",
+          "component": "ImageCarousel",
+          "items": [
+            {
+              "url": "https://example.com/images/sample-1.jpg",
+              "linkUrl": "https://open.dingtalk.com/",
+              "title": "Slide 1",
+              "description": "Carousel example"
+            },
+            {
+              "url": "https://example.com/images/sample-2.jpg",
+              "linkUrl": "https://open.dingtalk.com/",
+              "title": "Slide 2",
+              "description": "Image 2"
+            },
+            {
+              "url": "https://example.com/images/sample-3.jpg",
+              "linkUrl": "https://open.dingtalk.com/",
+              "title": "Slide 3",
+              "description": "Image 3"
+            }
+          ],
+          "autoplayIntervalMs": 5000,
+          "previewEnabled": true
+        }
+      ]
+    }
+  }
+]

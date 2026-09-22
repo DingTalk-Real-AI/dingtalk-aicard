@@ -1,0 +1,46 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "component_list_a2ui",
+      "components": [
+        {
+          "id": "root",
+          "component": "List",
+          "children": [
+            "item_a",
+            "item_b"
+          ],
+          "direction": "vertical"
+        },
+        {
+          "id": "item_a",
+          "component": "Text",
+          "text": {
+            "path": "/list/first"
+          }
+        },
+        {
+          "id": "item_b",
+          "component": "Text",
+          "text": {
+            "path": "/list/second"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "version": "v1.0",
+    "updateDataModel": {
+      "surfaceId": "component_list_a2ui",
+      "path": "/",
+      "value": {
+        "list": {
+          "first": "Item one",
+          "second": "Item two"
+        }
+      }
+    }
+  }
+]

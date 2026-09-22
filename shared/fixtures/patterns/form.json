@@ -1,0 +1,210 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "REPLACE_WITH_REAL_SURFACE_ID",
+      "components": [
+        {
+          "id": "root",
+          "component": "Card",
+          "child": "content",
+          "padding": 12,
+          "cornerRadius": 12
+        },
+        {
+          "id": "content",
+          "component": "Column",
+          "children": [
+            "header",
+            "subtitle",
+            "divider_top",
+            "form_intro",
+            "form_fields",
+            "divider_actions",
+            "actions"
+          ],
+          "align": "stretch",
+          "gap": 8
+        },
+        {
+          "id": "header",
+          "component": "Row",
+          "children": [
+            "title",
+            "status"
+          ],
+          "align": "center",
+          "gap": 8
+        },
+        {
+          "id": "title",
+          "component": "Text",
+          "text": {
+            "path": "/content/title"
+          },
+          "variant": "body",
+          "bold": true,
+          "colorToken": "common_level1_base_color",
+          "maxLine": 2,
+          "weight": 1
+        },
+        {
+          "id": "status",
+          "component": "Tag",
+          "text": {
+            "path": "/content/status"
+          },
+          "theme": "blue"
+        },
+        {
+          "id": "subtitle",
+          "component": "Text",
+          "text": {
+            "path": "/content/subtitle"
+          },
+          "variant": "caption",
+          "colorToken": "common_level2_base_color",
+          "maxLine": 3
+        },
+        {
+          "id": "divider_top",
+          "component": "Divider",
+          "axis": "horizontal",
+          "borderColorToken": "common_line_light_color"
+        },
+        {
+          "id": "form_intro",
+          "component": "Text",
+          "text": "请补充以下信息，Agent 才能继续",
+          "variant": "body",
+          "bold": true,
+          "colorToken": "common_level1_base_color"
+        },
+        {
+          "id": "form_fields",
+          "component": "Column",
+          "children": [
+            "comment",
+            "choice"
+          ],
+          "align": "stretch",
+          "gap": 12,
+          "padding": 12,
+          "cornerRadius": 8
+        },
+        {
+          "id": "comment",
+          "component": "TextField",
+          "label": "补充信息",
+          "value": {
+            "path": "/form/comment"
+          },
+          "placeholder": "请输入继续处理所需的信息",
+          "variant": "longText"
+        },
+        {
+          "id": "choice",
+          "component": "ChoicePicker",
+          "label": "执行方式",
+          "variant": "mutuallyExclusive",
+          "displayStyle": "checkbox",
+          "options": [
+            {
+              "label": "立即执行",
+              "value": "now"
+            },
+            {
+              "label": "定时执行",
+              "value": "scheduled"
+            }
+          ],
+          "value": {
+            "path": "/form/choice"
+          }
+        },
+        {
+          "id": "divider_actions",
+          "component": "Divider",
+          "axis": "horizontal",
+          "borderColorToken": "common_line_light_color"
+        },
+        {
+          "id": "secondary_label",
+          "component": "Text",
+          "text": "取消",
+          "variant": "body"
+        },
+        {
+          "id": "secondary_button",
+          "component": "Button",
+          "child": "secondary_label",
+          "variant": "borderless",
+          "weight": 1,
+          "action": {
+            "event": {
+              "name": "form_secondary",
+              "context": {
+                "bizId": "REPLACE_WITH_BIZ_ID",
+                "form": {
+                  "path": "/form"
+                }
+              }
+            }
+          }
+        },
+        {
+          "id": "primary_label",
+          "component": "Text",
+          "text": "提交",
+          "variant": "body"
+        },
+        {
+          "id": "primary_button",
+          "component": "Button",
+          "child": "primary_label",
+          "variant": "primary",
+          "weight": 1,
+          "action": {
+            "event": {
+              "name": "form_primary",
+              "context": {
+                "bizId": "REPLACE_WITH_BIZ_ID",
+                "form": {
+                  "path": "/form"
+                }
+              }
+            }
+          }
+        },
+        {
+          "id": "actions",
+          "component": "Row",
+          "children": [
+            "secondary_button",
+            "primary_button"
+          ],
+          "align": "center",
+          "gap": 8
+        }
+      ]
+    }
+  },
+  {
+    "version": "v1.0",
+    "updateDataModel": {
+      "surfaceId": "REPLACE_WITH_REAL_SURFACE_ID",
+      "path": "/",
+      "value": {
+        "content": {
+          "title": "补充发布信息",
+          "subtitle": "提交后由 Agent 继续执行",
+          "status": "待填写"
+        },
+        "form": {
+          "comment": "",
+          "choice": []
+        }
+      }
+    }
+  }
+]

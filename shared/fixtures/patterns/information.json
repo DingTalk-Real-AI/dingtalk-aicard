@@ -1,0 +1,252 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "REPLACE_WITH_REAL_SURFACE_ID",
+      "components": [
+        {
+          "id": "root",
+          "component": "Card",
+          "child": "content",
+          "padding": 12,
+          "cornerRadius": 12
+        },
+        {
+          "id": "content",
+          "component": "Column",
+          "children": [
+            "header",
+            "subtitle",
+            "divider_top",
+            "hero",
+            "body",
+            "divider_attachment",
+            "attachment_title",
+            "file",
+            "details",
+            "divider_actions",
+            "actions"
+          ],
+          "align": "stretch",
+          "gap": 8
+        },
+        {
+          "id": "header",
+          "component": "Row",
+          "children": [
+            "title",
+            "status"
+          ],
+          "align": "center",
+          "gap": 8
+        },
+        {
+          "id": "title",
+          "component": "Text",
+          "text": {
+            "path": "/content/title"
+          },
+          "variant": "body",
+          "bold": true,
+          "colorToken": "common_level1_base_color",
+          "maxLine": 2,
+          "weight": 1
+        },
+        {
+          "id": "status",
+          "component": "Tag",
+          "text": {
+            "path": "/content/status"
+          },
+          "theme": "blue"
+        },
+        {
+          "id": "subtitle",
+          "component": "Text",
+          "text": {
+            "path": "/content/subtitle"
+          },
+          "variant": "caption",
+          "colorToken": "common_level2_base_color",
+          "maxLine": 3
+        },
+        {
+          "id": "divider_top",
+          "component": "Divider",
+          "axis": "horizontal",
+          "borderColorToken": "common_line_light_color"
+        },
+        {
+          "id": "hero",
+          "component": "Image",
+          "url": "https://REPLACE_WITH_IMAGE_URL",
+          "fit": "cover",
+          "variant": "header",
+          "cornerRadius": 10,
+          "previewEnabled": true
+        },
+        {
+          "id": "body",
+          "component": "Markdown",
+          "content": {
+            "path": "/content/body"
+          }
+        },
+        {
+          "id": "divider_attachment",
+          "component": "Divider",
+          "axis": "horizontal",
+          "borderColorToken": "common_line_light_color"
+        },
+        {
+          "id": "attachment_title",
+          "component": "Text",
+          "text": "相关材料",
+          "variant": "body",
+          "bold": true,
+          "colorToken": "common_level1_base_color"
+        },
+        {
+          "id": "file",
+          "component": "File",
+          "fileName": {
+            "path": "/content/file/name"
+          },
+          "url": "https://REPLACE_WITH_FILE_URL",
+          "description": {
+            "path": "/content/file/description"
+          },
+          "onPreview": {
+            "event": {
+              "name": "information_file_preview",
+              "context": {
+                "bizId": "REPLACE_WITH_BIZ_ID"
+              }
+            }
+          }
+        },
+        {
+          "id": "details",
+          "component": "CollapsiblePanel",
+          "title": "补充说明",
+          "variant": "indented",
+          "defaultExpanded": false,
+          "maxHeight": 240,
+          "children": [
+            "details_content"
+          ],
+          "fallbackMarkdown": "### 补充说明\n\n请打开完整详情查看。"
+        },
+        {
+          "id": "details_content",
+          "component": "Column",
+          "children": [
+            "details_body",
+            "detail_link"
+          ],
+          "align": "stretch",
+          "gap": 8,
+          "padding": 12
+        },
+        {
+          "id": "details_body",
+          "component": "Markdown",
+          "content": {
+            "path": "/content/details"
+          }
+        },
+        {
+          "id": "detail_link",
+          "component": "Link",
+          "text": "打开完整详情",
+          "action": {
+            "functionCall": {
+              "call": "openUrl",
+              "args": {
+                "url": "https://REPLACE_WITH_DETAIL_URL"
+              }
+            }
+          }
+        },
+        {
+          "id": "divider_actions",
+          "component": "Divider",
+          "axis": "horizontal",
+          "borderColorToken": "common_line_light_color"
+        },
+        {
+          "id": "secondary_label",
+          "component": "Text",
+          "text": "稍后再看",
+          "variant": "body"
+        },
+        {
+          "id": "secondary_button",
+          "component": "Button",
+          "child": "secondary_label",
+          "variant": "default",
+          "weight": 1,
+          "action": {
+            "event": {
+              "name": "information_secondary",
+              "context": {
+                "bizId": "REPLACE_WITH_BIZ_ID"
+              }
+            }
+          }
+        },
+        {
+          "id": "primary_label",
+          "component": "Text",
+          "text": "查看详情",
+          "variant": "body"
+        },
+        {
+          "id": "primary_button",
+          "component": "Button",
+          "child": "primary_label",
+          "variant": "primary",
+          "weight": 1,
+          "action": {
+            "event": {
+              "name": "information_primary",
+              "context": {
+                "bizId": "REPLACE_WITH_BIZ_ID"
+              }
+            }
+          }
+        },
+        {
+          "id": "actions",
+          "component": "Row",
+          "children": [
+            "secondary_button",
+            "primary_button"
+          ],
+          "align": "center",
+          "gap": 8
+        }
+      ]
+    }
+  },
+  {
+    "version": "v1.0",
+    "updateDataModel": {
+      "surfaceId": "REPLACE_WITH_REAL_SURFACE_ID",
+      "path": "/",
+      "value": {
+        "content": {
+          "title": "季度执行报告已就绪",
+          "subtitle": "2026 Q3 · 产品与交付联合复盘",
+          "status": "已发布",
+          "body": "本季度三条主线全部按期交付，客户满意度回升至 92%。",
+          "file": {
+            "name": "Q3-执行报告.pdf",
+            "description": "完整版 · 18 页"
+          },
+          "details": "- 数据口径：截至 9 月 15 日\n- 满意度为季度抽样调研"
+        }
+      }
+    }
+  }
+]

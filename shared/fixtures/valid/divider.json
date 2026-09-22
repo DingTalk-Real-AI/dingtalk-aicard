@@ -1,0 +1,17 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "component_divider_a2ui",
+      "components": [
+        {
+          "id": "root",
+          "component": "Divider",
+          "axis": "horizontal",
+          "borderWidth": 0.5,
+          "borderColor": "#1F111F2C"
+        }
+      ]
+    }
+  }
+]

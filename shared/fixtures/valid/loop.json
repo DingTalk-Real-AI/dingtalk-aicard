@@ -1,0 +1,47 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "component_loop_a2ui",
+      "components": [
+        {
+          "id": "root",
+          "component": "Loop",
+          "children": {
+            "componentId": "loop_item",
+            "path": "/loop/items"
+          }
+        },
+        {
+          "id": "loop_item",
+          "component": "Text",
+          "text": {
+            "path": "title"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "version": "v1.0",
+    "updateDataModel": {
+      "surfaceId": "component_loop_a2ui",
+      "path": "/",
+      "value": {
+        "loop": {
+          "items": [
+            {
+              "title": "Requirements"
+            },
+            {
+              "title": "Visual design"
+            },
+            {
+              "title": "Integration"
+            }
+          ]
+        }
+      }
+    }
+  }
+]

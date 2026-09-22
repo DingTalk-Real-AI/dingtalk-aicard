@@ -1,0 +1,26 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "s",
+      "components": [
+        {
+          "id": "root",
+          "component": "Stack",
+          "child": "base",
+          "overlays": [
+            {
+              "child": "MISSING",
+              "position": "topStart"
+            }
+          ]
+        },
+        {
+          "id": "base",
+          "component": "Text",
+          "text": "x"
+        }
+      ]
+    }
+  }
+]

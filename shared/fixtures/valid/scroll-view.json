@@ -1,0 +1,33 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "component_scroll_view_a2ui",
+      "components": [
+        {
+          "id": "root",
+          "component": "ScrollView",
+          "direction": "horizontal",
+          "autoScrollOnUpdate": false,
+          "maxHeight": 180,
+          "children": [
+            "public_content"
+          ],
+          "action": {
+            "event": {
+              "name": "scroller_item_selected",
+              "context": {
+                "index": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "public_content",
+          "component": "Markdown",
+          "content": "**ScrollView** public component content"
+        }
+      ]
+    }
+  }
+]

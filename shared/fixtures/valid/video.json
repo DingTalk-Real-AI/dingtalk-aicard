@@ -1,0 +1,33 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "component_video_a2ui",
+      "components": [
+        {
+          "id": "root",
+          "component": "Video",
+          "url": {
+            "path": "/video/url"
+          },
+          "posterUrl": {
+            "path": "/video/posterUrl"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "version": "v1.0",
+    "updateDataModel": {
+      "surfaceId": "component_video_a2ui",
+      "path": "/",
+      "value": {
+        "video": {
+          "url": "https://example.com/videos/sample.mp4",
+          "posterUrl": "https://example.com/images/sample-1.jpg"
+        }
+      }
+    }
+  }
+]

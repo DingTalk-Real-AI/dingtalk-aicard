@@ -1,0 +1,33 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "component_chart_a2ui",
+      "components": [
+        {
+          "id": "root",
+          "component": "Chart",
+          "data": {
+            "type": "pieChart",
+            "data": [
+              {
+                "x": "R&D",
+                "y": 22
+              },
+              {
+                "x": "Product",
+                "y": 8
+              },
+              {
+                "x": "Design",
+                "y": 3
+              }
+            ],
+            "config": {}
+          },
+          "aspectRatio": "1:1"
+        }
+      ]
+    }
+  }
+]

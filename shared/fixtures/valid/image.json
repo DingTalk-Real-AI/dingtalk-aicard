@@ -1,0 +1,37 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "component_image_a2ui",
+      "components": [
+        {
+          "id": "root",
+          "component": "Image",
+          "url": {
+            "path": "/data/image/url"
+          },
+          "darkUrl": {
+            "path": "/data/image/darkUrl"
+          },
+          "fit": "cover",
+          "variant": "mediumFeature"
+        }
+      ]
+    }
+  },
+  {
+    "version": "v1.0",
+    "updateDataModel": {
+      "surfaceId": "component_image_a2ui",
+      "path": "/",
+      "value": {
+        "data": {
+          "image": {
+            "url": "https://example.com/images/sample-1.jpg",
+            "darkUrl": "https://example.com/images/sample-2.jpg"
+          }
+        }
+      }
+    }
+  }
+]

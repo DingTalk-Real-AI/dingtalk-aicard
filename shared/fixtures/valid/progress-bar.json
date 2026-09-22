@@ -1,0 +1,40 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "component_progress_bar_a2ui",
+      "components": [
+        {
+          "id": "root",
+          "component": "ProgressBar",
+          "variant": "bar",
+          "value": {
+            "path": "/progress/value"
+          },
+          "showLabel": true,
+          "labelPosition": "end",
+          "customLightColor": "#0066FF",
+          "customDarkColor": "#47A9FF",
+          "rounded": true,
+          "size": "medium",
+          "accessibility": {
+            "label": "Task progress",
+            "description": "The current task is 68% complete"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "version": "v1.0",
+    "updateDataModel": {
+      "surfaceId": "component_progress_bar_a2ui",
+      "path": "/",
+      "value": {
+        "progress": {
+          "value": 68
+        }
+      }
+    }
+  }
+]

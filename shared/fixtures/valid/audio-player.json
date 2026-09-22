@@ -1,0 +1,33 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "component_audio_player_a2ui",
+      "components": [
+        {
+          "id": "root",
+          "component": "AudioPlayer",
+          "url": {
+            "path": "/audio/url"
+          },
+          "description": {
+            "path": "/audio/description"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "version": "v1.0",
+    "updateDataModel": {
+      "surfaceId": "component_audio_player_a2ui",
+      "path": "/",
+      "value": {
+        "audio": {
+          "url": "https://example.com/audio/sample.mp3",
+          "description": "Meeting audio sample"
+        }
+      }
+    }
+  }
+]

@@ -1,0 +1,43 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "component_image_upload_a2ui",
+      "components": [
+        {
+          "id": "root",
+          "component": "ImageUpload",
+          "label": "Upload screenshot",
+          "value": {
+            "path": "/imageUpload/value"
+          },
+          "maxFiles": 3,
+          "requiresAuth": true,
+          "disabled": false,
+          "action": {
+            "event": {
+              "name": "images_uploaded",
+              "context": {
+                "images": {
+                  "path": "/imageUpload/value"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  {
+    "version": "v1.0",
+    "updateDataModel": {
+      "surfaceId": "component_image_upload_a2ui",
+      "path": "/",
+      "value": {
+        "imageUpload": {
+          "value": []
+        }
+      }
+    }
+  }
+]

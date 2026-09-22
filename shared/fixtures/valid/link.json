@@ -1,0 +1,23 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "component_link_a2ui",
+      "components": [
+        {
+          "id": "root",
+          "component": "Link",
+          "text": "View details",
+          "action": {
+            "event": {
+              "name": "link_tap",
+              "context": {
+                "component": "Link"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+]

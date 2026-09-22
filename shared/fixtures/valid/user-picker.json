@@ -1,0 +1,43 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "component_user_picker_a2ui",
+      "components": [
+        {
+          "id": "root",
+          "component": "UserPicker",
+          "title": "Select owner",
+          "placeholder": "Select a user",
+          "maxSelections": 5,
+          "value": {
+            "path": "/userPicker/value"
+          },
+          "disabled": false,
+          "action": {
+            "event": {
+              "name": "users_selected",
+              "context": {
+                "users": {
+                  "path": "/userPicker/value"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  {
+    "version": "v1.0",
+    "updateDataModel": {
+      "surfaceId": "component_user_picker_a2ui",
+      "path": "/",
+      "value": {
+        "userPicker": {
+          "value": []
+        }
+      }
+    }
+  }
+]

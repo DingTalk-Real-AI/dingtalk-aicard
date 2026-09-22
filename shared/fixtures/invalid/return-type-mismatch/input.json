@@ -1,0 +1,49 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "s",
+      "components": [
+        {
+          "id": "root",
+          "component": "Button",
+          "checks": [
+            {
+              "condition": {
+                "call": "required",
+                "args": {
+                  "value": {
+                    "path": "/v"
+                  }
+                },
+                "returnType": "string"
+              },
+              "message": "m"
+            }
+          ],
+          "child": "label",
+          "action": {
+            "event": {
+              "name": "submit"
+            }
+          }
+        },
+        {
+          "id": "label",
+          "component": "Text",
+          "text": "提交"
+        }
+      ]
+    }
+  },
+  {
+    "version": "v1.0",
+    "updateDataModel": {
+      "surfaceId": "s",
+      "path": "/",
+      "value": {
+        "v": ""
+      }
+    }
+  }
+]

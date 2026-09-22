@@ -1,0 +1,30 @@
+__pycache__/
+*.pyc
+.DS_Store
+shared/.dws-install.json
+
+# Local Python environments, test caches, and analysis artifacts.
+/.venv/
+/venv/
+.aicard-venv/
+.aicard-venv.lock
+.aicard-venv.setup.log
+.aicard-setup-*/
+/.pytest_cache/
+/.analysis-artifacts/
+
+# Private Skill evaluation inputs, workspaces, and results; never distribute with the Skill.
+/evals/data/
+/evals/work/
+/evals/results/
+
+# Ignore obsolete paths written by older tools; evals/ is the maintained entrypoint.
+/eval-data/
+/.eval-work/
+/eval-results/
+
+# Temporary sync candidates; commit the canonical shared/.protocol-sync.json.
+/.protocol-sync-*/
+
+# Locally packaged Skill archive, including possible macOS resource forks.
+/skills/dingtalk-aicard.zip

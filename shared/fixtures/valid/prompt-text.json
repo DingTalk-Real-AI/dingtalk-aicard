@@ -1,0 +1,64 @@
+[
+  {
+    "version": "v1.0",
+    "updateDataModel": {
+      "surfaceId": "open-prompt-text",
+      "path": "/",
+      "value": {
+        "promptText": {
+          "presetText": "Explain the promptText action in detail"
+        }
+      }
+    }
+  },
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "open-prompt-text",
+      "components": [
+        {
+          "id": "root",
+          "component": "Column",
+          "children": [
+            "title",
+            "description",
+            "prompt-button"
+          ]
+        },
+        {
+          "id": "title",
+          "component": "Text",
+          "text": "Input text"
+        },
+        {
+          "id": "description",
+          "component": "Text",
+          "text": "Tap to open the single-line input panel with preset text."
+        },
+        {
+          "id": "prompt-button",
+          "component": "Button",
+          "child": "prompt-label",
+          "variant": "primary",
+          "action": {
+            "functionCall": {
+              "catalogId": "urn:dingtalk:a2ui:host:v1",
+              "call": "promptText",
+              "args": {
+                "title": "Enter content",
+                "initialValue": {
+                  "path": "/promptText/presetText"
+                }
+              }
+            }
+          }
+        },
+        {
+          "id": "prompt-label",
+          "component": "Text",
+          "text": "Edit text"
+        }
+      ]
+    }
+  }
+]

@@ -1,0 +1,46 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "component_button_a2ui",
+      "components": [
+        {
+          "id": "root",
+          "component": "Button",
+          "child": "label",
+          "variant": "primary",
+          "action": {
+            "event": {
+              "name": "confirm_pressed",
+              "context": {
+                "intent": "confirm"
+              }
+            }
+          }
+        },
+        {
+          "id": "label",
+          "component": "Text",
+          "text": {
+            "path": "/button/label"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "version": "v1.0",
+    "updateDataModel": {
+      "surfaceId": "component_button_a2ui",
+      "path": "/",
+      "value": {
+        "button": {
+          "label": "Confirm"
+        },
+        "actions": {
+          "confirmResult": null
+        }
+      }
+    }
+  }
+]

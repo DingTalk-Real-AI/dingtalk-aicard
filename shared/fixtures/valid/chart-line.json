@@ -1,0 +1,38 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "component_chart_a2ui",
+      "components": [
+        {
+          "id": "root",
+          "component": "Chart",
+          "data": {
+            "type": "lineChart",
+            "data": [
+              {
+                "x": "Mon",
+                "type": "Active",
+                "y": 48
+              },
+              {
+                "x": "Tue",
+                "type": "Active",
+                "y": 74
+              },
+              {
+                "x": "Wed",
+                "type": "Active",
+                "y": 66
+              }
+            ],
+            "config": {
+              "lineShape": "smooth"
+            }
+          },
+          "aspectRatio": "16:9"
+        }
+      ]
+    }
+  }
+]

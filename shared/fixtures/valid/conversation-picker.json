@@ -1,0 +1,44 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "component_conversation_picker_a2ui",
+      "components": [
+        {
+          "id": "root",
+          "component": "ConversationPicker",
+          "title": "Select conversation",
+          "placeholder": "Select a conversation",
+          "multiple": true,
+          "maxSelections": 3,
+          "value": {
+            "path": "/conversationPicker/value"
+          },
+          "disabled": false,
+          "action": {
+            "event": {
+              "name": "conversations_selected",
+              "context": {
+                "conversations": {
+                  "path": "/conversationPicker/value"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  {
+    "version": "v1.0",
+    "updateDataModel": {
+      "surfaceId": "component_conversation_picker_a2ui",
+      "path": "/",
+      "value": {
+        "conversationPicker": {
+          "value": []
+        }
+      }
+    }
+  }
+]

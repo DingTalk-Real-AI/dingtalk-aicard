@@ -1,0 +1,44 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "component_stack_a2ui",
+      "components": [
+        {
+          "id": "root",
+          "component": "Stack",
+          "child": "book_button",
+          "overlays": [
+            {
+              "child": "price_badge",
+              "position": "topEnd"
+            }
+          ]
+        },
+        {
+          "id": "book_button",
+          "component": "Button",
+          "child": "book_label",
+          "variant": "primary",
+          "action": {
+            "event": {
+              "name": "book_hotel",
+              "context": {}
+            }
+          }
+        },
+        {
+          "id": "book_label",
+          "component": "Text",
+          "text": "Book a hotel"
+        },
+        {
+          "id": "price_badge",
+          "component": "Tag",
+          "text": "Best price",
+          "theme": "orange"
+        }
+      ]
+    }
+  }
+]

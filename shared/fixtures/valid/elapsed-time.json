@@ -1,0 +1,17 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "component_elapsed_time_a2ui",
+      "components": [
+        {
+          "id": "root",
+          "component": "ElapsedTime",
+          "prefix": "Elapsed: ",
+          "suffix": "",
+          "textStyleType": "Standard"
+        }
+      ]
+    }
+  }
+]

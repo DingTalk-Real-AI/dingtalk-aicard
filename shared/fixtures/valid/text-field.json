@@ -1,0 +1,42 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "component_text_field_a2ui",
+      "components": [
+        {
+          "id": "root",
+          "component": "TextField",
+          "label": {
+            "path": "/textField/label"
+          },
+          "value": {
+            "path": "/textField/value"
+          },
+          "placeholder": {
+            "path": "/textField/placeholder"
+          },
+          "variant": "longText",
+          "accessibility": {
+            "label": "Approval comment",
+            "description": "Add a note for this approval"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "version": "v1.0",
+    "updateDataModel": {
+      "surfaceId": "component_text_field_a2ui",
+      "path": "/",
+      "value": {
+        "textField": {
+          "label": "Approval comment",
+          "value": "Approved. Please proceed as planned.",
+          "placeholder": "Enter an approval comment"
+        }
+      }
+    }
+  }
+]

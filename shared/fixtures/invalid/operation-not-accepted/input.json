@@ -1,0 +1,2 @@
+[{"version":"v1.0","updateComponents":{"surfaceId":"s","components":[{"id":"root","component":"Text","text":"x"}]}},
+ {"version":"v1.0","callRendererFunction":{"surfaceId":"s","functionCall":{"call":"copyText","catalogId":"urn:dingtalk:a2ui:host:v1","args":{"text":"x"}}}}]

@@ -1,0 +1,48 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "open-basic",
+      "components": [
+        {
+          "id": "root",
+          "component": "Column",
+          "children": [
+            "title",
+            "body",
+            "confirm"
+          ]
+        },
+        {
+          "id": "title",
+          "component": "Text",
+          "text": "Task confirmation",
+          "colorToken": "common_level1_base_color"
+        },
+        {
+          "id": "body",
+          "component": "Markdown",
+          "content": "Review the content and tap Confirm."
+        },
+        {
+          "id": "confirm",
+          "component": "Button",
+          "child": "confirm-label",
+          "action": {
+            "event": {
+              "name": "confirm",
+              "context": {
+                "taskId": "demo-task"
+              }
+            }
+          }
+        },
+        {
+          "id": "confirm-label",
+          "component": "Text",
+          "text": "Confirm"
+        }
+      ]
+    }
+  }
+]

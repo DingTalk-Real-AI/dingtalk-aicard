@@ -1,0 +1,59 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "component_chart_a2ui",
+      "components": [
+        {
+          "id": "root",
+          "component": "Chart",
+          "data": {
+            "path": "/data/chart"
+          },
+          "height": 180
+        }
+      ]
+    }
+  },
+  {
+    "version": "v1.0",
+    "updateDataModel": {
+      "surfaceId": "component_chart_a2ui",
+      "path": "/",
+      "value": {
+        "data": {
+          "chart": {
+            "type": "lineChart",
+            "data": [
+              {
+                "x": "2026-08-01",
+                "y": 96,
+                "type": "Energy"
+              },
+              {
+                "x": "2026-08-02",
+                "y": 108,
+                "type": "Energy"
+              },
+              {
+                "x": "2026-08-03",
+                "y": 101,
+                "type": "Energy"
+              }
+            ],
+            "config": {
+              "xAxisConfig": {
+                "type": "timeCat",
+                "tickCount": 3
+              },
+              "yAxisConfig": {
+                "min": 0,
+                "tickCount": 5
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+]

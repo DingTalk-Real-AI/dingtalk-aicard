@@ -1,0 +1,37 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "component_checkable_image_list_a2ui",
+      "components": [
+        {
+          "id": "root",
+          "component": "CheckableImageList",
+          "images": [
+            "https://example.com/images/sample-1.jpg",
+            "https://example.com/images/sample-2.jpg",
+            "https://example.com/images/sample-3.jpg"
+          ],
+          "value": {
+            "path": "/checkableImages/selectedIndexes"
+          },
+          "previewEnabled": true
+        }
+      ]
+    }
+  },
+  {
+    "version": "v1.0",
+    "updateDataModel": {
+      "surfaceId": "component_checkable_image_list_a2ui",
+      "path": "/",
+      "value": {
+        "checkableImages": {
+          "selectedIndexes": [
+            0
+          ]
+        }
+      }
+    }
+  }
+]

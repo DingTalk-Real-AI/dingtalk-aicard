@@ -1,0 +1,25 @@
+[
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "component_collapsible_panel_a2ui",
+      "components": [
+        {
+          "id": "root",
+          "component": "CollapsiblePanel",
+          "title": "Approval details",
+          "icon": "https://example.com/images/sample-1.jpg",
+          "darkIcon": "https://example.com/images/sample-2.jpg",
+          "children": [
+            "collapsible_panel_content"
+          ]
+        },
+        {
+          "id": "collapsible_panel_content",
+          "component": "Markdown",
+          "content": "**Approval details**\n\nRequester: Alice  ·  Status: Pending"
+        }
+      ]
+    }
+  }
+]
