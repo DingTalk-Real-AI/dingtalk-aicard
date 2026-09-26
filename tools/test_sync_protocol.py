@@ -25,6 +25,13 @@ spec.loader.exec_module(sync)
 
 
 class SyncTests(unittest.TestCase):
+    def test_pattern_links_in_generated_skill_index(self):
+        projected = sync.skill_examples_readme(p.name for p in (ROOT / 'spec/examples').glob('*.json')).decode('utf-8')
+        self.assertNotIn('../../skills/dingtalk-aicard/references/patterns/', projected)
+        for name in ('form', 'progress', 'report'):
+            self.assertIn(f'../../patterns/{name}.md', projected)
+            self.assertTrue((ROOT / sync.SKILL_PROTOCOL / 'examples' / f'../../patterns/{name}.md').is_file())
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory(dir=os.environ.get('TMPDIR') or ROOT)
         self.addCleanup(self.temp.cleanup)
@@ -122,7 +129,7 @@ class SyncTests(unittest.TestCase):
         state = sync.load_state(self.repo)
         self.assertEqual(set(sync.PROTOCOL_FILES), set(state['files']['protocol']))
         self.assertFalse((self.repo / sync.SKILL_PROTOCOL / 'README.md').exists())
-        self.assertEqual(sync.skill_examples_readme((self.repo / 'spec/examples/README.md').read_bytes()),
+        self.assertEqual(sync.skill_examples_readme(p.name for p in (self.repo / 'spec/examples').glob('*.json')),
                          (self.repo / sync.SKILL_PROTOCOL / 'examples/README.md').read_bytes())
         self.assertIn(str(sync.GO_ASSETS), state['generated'])
         self.assertIn(sync.RULES_NAME, state['files']['validation_rules'])
@@ -166,18 +173,40 @@ class SyncTests(unittest.TestCase):
             self.run_sync(skip_conformance=True)
         self.assert_unchanged()
 
-    def test_example_index_projection_keeps_source_and_skill_links_separate(self):
-        source = (self.source / 'examples/README.md').read_bytes()
-        projected = sync.skill_examples_readme(source)
-        self.assertIn(b'../../../SKILL.md', projected)
-        self.assertNotIn(b'../README.md', projected)
-        self.assertEqual(source, (self.source / 'examples/README.md').read_bytes())
-        with self.assertRaisesRegex(ValueError, 'Surface'):
-            sync.skill_examples_readme(b'changed source index')
+    def test_imported_index_prose_does_not_control_skill_navigation(self):
+        names = sorted(p.name for p in (self.source / 'examples').glob('*.json'))
+        source = '# A different upstream index\n\n' + '\n'.join(f'[{n}]({n})' for n in names)
+        (self.source / 'examples/README.md').write_text(source)
+        self.assertEqual(0, self.run_sync(skip_conformance=True))
+        self.assertEqual(source, (self.repo / 'spec/examples/README.md').read_text())
+        result = (self.repo / sync.SKILL_PROTOCOL / 'examples/README.md').read_bytes()
+        self.assertEqual(sync.skill_examples_readme(names), result)
+        self.assertIn(b'../../../SKILL.md', result)
+        self.assertIn(b'../../patterns/progress.md#examples-and-replay', result)
+
+    def test_unmapped_or_removed_example_blocks_import_before_publication(self):
+        for mutation in ('added', 'removed', 'renamed'):
+            with self.subTest(mutation=mutation):
+                path = self.source / 'examples/agent-run.json'
+                extra = self.source / 'examples/extra.json'
+                original = path.read_bytes()
+                index = self.source / 'examples/README.md'
+                original_index = index.read_bytes()
+                if mutation != 'removed':
+                    extra.write_bytes(original)
+                if mutation != 'added':
+                    path.unlink()
+                index.write_text('\n'.join(f'[{p.name}]({p.name})' for p in sorted(index.parent.glob('*.json'))))
+                with self.assertRaisesRegex(ValueError, 'Skill example guidance'):
+                    self.run_sync(skip_conformance=True)
+                self.assert_unchanged()
+                extra.unlink(missing_ok=True)
+                path.write_bytes(original)
+                index.write_bytes(original_index)
 
     def test_scenario_and_fixture_sources_are_independent(self):
         groups = sync.source_groups(self.source, self.rules)
-        self.assertEqual(4, len(groups['protocol_examples']) - 1)
+        self.assertEqual(5, len(groups['protocol_examples']) - 1)
         self.assertEqual(54, len(groups['examples']))
         self.assertIn('form-interaction.json', groups['protocol_examples'])
         self.assertNotIn('form-interaction.json', groups['examples'])
@@ -378,6 +407,36 @@ class SyncTests(unittest.TestCase):
         for name in sync.REPOSITORY_DOCS:
             self.assertEqual((docs / name).read_bytes(), (self.repo / name).read_bytes())
             self.assertEqual(sync.digest(docs / name), state['files']['repository_docs'][name])
+
+    def test_readme_export_strips_metadata_and_is_idempotent(self):
+        self.track_repository_docs()
+        docs = self.work / 'repository-docs'
+        docs.mkdir()
+        body = b'# Public README\n\n---\n\nKeep this body separator.\n'
+        original = b'---\nstatus: authoritative\n---\n\n' + body
+        (docs / 'README.md').write_bytes(original)
+        (docs / 'CONTRIBUTING.md').write_bytes(original)
+        self.assertEqual(0, self.run_sync(repository_docs=docs, skip_conformance=True))
+        self.assertEqual(body, (self.repo / 'README.md').read_bytes())
+        self.assertEqual(original, (docs / 'README.md').read_bytes())
+        self.assertEqual(original, (self.repo / 'CONTRIBUTING.md').read_bytes())
+        state = sync.check_local_inputs(self.repo)
+        self.assertEqual(sync.digest(self.repo / 'README.md'), state['files']['repository_docs']['README.md'])
+        self.assertEqual(0, self.run_sync(repository_docs=docs, check=True))
+        (self.repo / 'README.md').write_bytes(body + b'Local edit\n')
+        with self.assertRaisesRegex(ValueError, 'Refusing to overwrite local edits'):
+            self.run_sync(repository_docs=docs, skip_conformance=True)
+
+    def test_readme_export_handles_line_endings_and_rejects_unclosed_metadata(self):
+        source = self.work / 'readme-source.md'
+        for prefix in (b'---\nstatus: reference\n---\n\n',
+                       b'\xef\xbb\xbf---\r\nstatus: reference\r\n---\r\n\r\n'):
+            source.write_bytes(prefix + b'# README\n')
+            self.assertEqual(b'# README\n', sync.imported_bytes('README.md', source))
+            self.assertEqual(source.read_bytes(), sync.imported_bytes('spec/README.md', source))
+        source.write_bytes(b'---\nstatus: reference\n')
+        with self.assertRaisesRegex(ValueError, 'unterminated front matter'):
+            sync.imported_bytes('README.md', source)
 
     def test_release_versions_and_upstream_must_match_notice(self):
         self.assertEqual(0, self.run_sync(skip_conformance=True))
