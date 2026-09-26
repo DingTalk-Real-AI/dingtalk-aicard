@@ -1,5 +1,23 @@
 # Repository maintenance rules
 
+## Repository responsibilities
+
+- `skills/dingtalk-aicard/` is the standalone A2UI authoring Skill. It guides
+  creation and editing of A2UI JSON and provides offline contract lookup and
+  validation through Python. It does not require DWS; sending is delegated to
+  an available delivery capability when requested.
+- `dws-aicard/` is the module integrated into DWS for the A2UI authoring and
+  delivery workflow. It includes the generated DWS Skill, embedded protocol,
+  native Go validator, and `dws aicard explain`, `lint`, and `preview` commands.
+  The Skill guides JSON authoring; the commands query contracts, validate
+  payloads, and create and send a real self-preview. Sending to other people
+  or groups and updating or finishing cards use the existing DWS
+  `chat message send-a2ui-card` and `chat message update-a2ui-card` commands,
+  not a separate `aicard send` command.
+- Keep authoring guidance, native execution, and delivery responsibilities
+  distinct. Generating the DWS Skill here does not install or build the module
+  in an external DWS checkout.
+
 ## Language of repository content
 
 Write new or modified developer-facing prose in English, including Skill
@@ -28,7 +46,8 @@ upstream generation paths; do not edit their generated files directly.
 only and is not distributed with either Skill. Compatibility boundaries and
 terms are in that README; retired standalone pages are not imported.
 `tools/sync_protocol.py` uses a distribution manifest for the standalone Skill
-and projects the examples index's creation guidance to the Skill entrypoint.
+and generates its example navigation from the local `EXAMPLE_GUIDANCE` mapping,
+independently of imported README prose. Keep the mapping aligned with example JSON files.
 Keep Schema files, example JSON, LICENSE, and NOTICE unchanged when editing
 Skill guidance. DWS `references/` must remain byte-identical to the standalone
 `references/`; do not remove files from the DWS copy alone.
