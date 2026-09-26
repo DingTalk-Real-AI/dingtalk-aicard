@@ -13,9 +13,7 @@ import (
 	"io"
 	"io/fs"
 	"net/url"
-	"sort"
 	"strings"
-	"sync"
 	"unicode/utf8"
 
 	"github.com/dlclark/regexp2"
@@ -26,10 +24,11 @@ import (
 var assetsJSON []byte
 
 type assets struct {
-	Manifest        map[string]string         `json:"manifest"`
-	Explain         map[string]map[string]any `json:"explain"`
-	UnicodeClasses  map[string]string         `json:"unicodeClasses"`
-	ValidationRules string                    `json:"validationRules"`
+	ExplainSHA256   string            `json:"explainSha256"`
+	Manifest        map[string]string `json:"manifest"`
+	ChildRefs       map[string][]any  `json:"childRefs"`
+	UnicodeClasses  map[string]string `json:"unicodeClasses"`
+	ValidationRules string            `json:"validationRules"`
 }
 
 type Protocol struct {
@@ -110,8 +109,16 @@ func (r protocolRegexp) MatchString(s string) bool {
 
 // Load requires only the embedded Skill filesystem, never an installed Skill or Python.
 func Load(source fs.FS) (*Protocol, error) {
+	return load(source, assetsJSON)
+}
+
+func load(source fs.FS, assetData []byte) (*Protocol, error) {
 	p := &Protocol{docs: map[string]map[string]any{}}
-	if err := json.Unmarshal(assetsJSON, &p.assets); err != nil {
+	if err := json.Unmarshal(assetData, &p.assets); err != nil {
+		return nil, err
+	}
+	store, err := BundledExplain()
+	if err != nil {
 		return nil, err
 	}
 	var rules map[string]any
@@ -163,17 +170,14 @@ func Load(source fs.FS) (*Protocol, error) {
 			return nil, err
 		}
 	}
-	var err error
 	p.schema, err = c.Compile(str(p.docs["agent-to-renderer.json"]["$id"]))
 	if err != nil {
 		return nil, err
 	}
 	// Compile even references not reachable from the envelope. A stale fragment is a package error.
 	for _, doc := range p.docs {
-		base, err := url.Parse(str(doc["$id"]))
-		if err != nil {
-			return nil, err
-		}
+		// AddResource already parsed and accepted every document ID above.
+		base, _ := url.Parse(str(doc["$id"]))
 		var walk func(any) error
 		walk = func(v any) error {
 			switch n := v.(type) {
@@ -204,6 +208,10 @@ func Load(source fs.FS) (*Protocol, error) {
 		if err := walk(doc); err != nil {
 			return nil, err
 		}
+	}
+	// Preserve specific resource/Schema diagnostics before reporting cross-bundle drift.
+	if err := store.CheckManifest(p.assets.Manifest); err != nil {
+		return nil, err
 	}
 	return p, nil
 }
@@ -283,43 +291,22 @@ func (p *Protocol) Manifest() map[string]string {
 	return out
 }
 
-func (p *Protocol) Explain(name string) map[string]any {
-	name = strings.TrimSpace(name)
-	for key, result := range p.assets.Explain {
-		if key == name || result["kind"] != "token-item" && strings.EqualFold(key, name) {
-			b, _ := json.Marshal(result)
-			v, _ := decode(b)
-			return object(v)
-		}
+// CheckExplainAssets verifies every named definition for the full package self-check.
+func (p *Protocol) CheckExplainAssets() error {
+	store, err := BundledExplain()
+	if err != nil {
+		return err
 	}
-	type candidate struct {
-		name     string
-		distance int
+	return store.CheckAll(p.assets.Manifest, p.assets.ExplainSHA256)
+}
+
+// Explain returns loading or decoding errors to the caller without panicking.
+func (p *Protocol) Explain(name string) (map[string]any, error) {
+	store, err := BundledExplain()
+	if err != nil {
+		return nil, err
 	}
-	candidates := []candidate{}
-	for key, result := range p.assets.Explain {
-		if result["kind"] == "token-item" {
-			continue
-		}
-		d := editDistance(strings.ToLower(name), strings.ToLower(key))
-		if d <= len([]rune(key))/2+1 {
-			candidates = append(candidates, candidate{key, d})
-		}
-	}
-	sort.Slice(candidates, func(i, j int) bool {
-		if candidates[i].distance != candidates[j].distance {
-			return candidates[i].distance < candidates[j].distance
-		}
-		return candidates[i].name < candidates[j].name
-	})
-	suggestions := []string{}
-	for i, c := range candidates {
-		if i == 5 {
-			break
-		}
-		suggestions = append(suggestions, c.name)
-	}
-	return map[string]any{"kind": "unknown", "name": name, "suggestions": suggestions}
+	return store.Lookup(name)
 }
 
 func editDistance(a, b string) int {
@@ -380,11 +367,8 @@ func (p *Protocol) Lint(data []byte, fragment, emit bool) (Report, error) {
 	}
 	for i, message := range messages {
 		if err := p.schema.Validate(message); err != nil {
-			validation, ok := err.(*jsonschema.ValidationError)
-			if !ok {
-				return report, err
-			}
-			report.Diagnostics = append(report.Diagnostics, p.diagnostics(validation, message, fmt.Sprintf("/%d", i))...)
+			// jsonschema.Schema.Validate wraps every failure in ValidationError.
+			report.Diagnostics = append(report.Diagnostics, p.diagnostics(err.(*jsonschema.ValidationError), message, fmt.Sprintf("/%d", i))...)
 		}
 	}
 	if prefix != "" {
@@ -400,22 +384,16 @@ func (p *Protocol) Lint(data []byte, fragment, emit bool) (Report, error) {
 	report.Valid = len(report.Diagnostics) == 0
 	if report.Valid && emit {
 		for _, m := range messages {
-			b, err := json.Marshal(m)
-			if err != nil {
-				return report, err
-			}
+			// All messages came from decode, so their values are JSON encodable.
+			b, _ := json.Marshal(m)
 			report.A2UIMessages = append(report.A2UIMessages, string(b))
 		}
 	}
 	return report, nil
 }
 
-// Cache belongs to the immutable embedded package, not to input data.
-var loadOnce sync.Once
-var cached *Protocol
-var cachedError error
-
+// Bundled keeps the compatibility entry point without caching an arbitrary
+// filesystem; the caller that owns a known immutable embed may cache Load.
 func Bundled(source fs.FS) (*Protocol, error) {
-	loadOnce.Do(func() { cached, cachedError = Load(source) })
-	return cached, cachedError
+	return Load(source)
 }

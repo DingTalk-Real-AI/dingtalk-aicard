@@ -11,7 +11,7 @@ import (
 	"testing"
 )
 
-func TestAicardReferencePreflightSharedCases(t *testing.T) {
+func TestCrossPlatformCoverageAicardReferencePreflightSharedCases(t *testing.T) {
 	p := testProtocol(t)
 	// Case names are English; some card text remains localized to cover Unicode payloads.
 	data, err := os.ReadFile("testdata/preflight-references.json")
@@ -61,7 +61,7 @@ func TestAicardReferencePreflightSharedCases(t *testing.T) {
 	}
 }
 
-func TestAicardDeepReferenceGraph(t *testing.T) {
+func TestCrossPlatformCoverageAicardDeepReferenceGraph(t *testing.T) {
 	p := testProtocol(t)
 	nodes := []any{}
 	for i := 0; i < 1500; i++ {
