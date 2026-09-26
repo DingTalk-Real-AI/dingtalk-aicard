@@ -2,7 +2,7 @@
 
 # DingTalk AI Card
 
-**Turn business data and agent output into interactive experiences in DingTalk.**
+**Turn business data and AI agent output into interactive cards in DingTalk.**
 
 An A2UI-based interface layer for business applications and AI agents. Compose interactive cards with declarative JSON and bring them to DingTalk across six platforms.
 
