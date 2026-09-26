@@ -12,6 +12,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/DingTalk-Real-AI/dingtalk-workspace-cli/internal/corecmd"
 	"github.com/DingTalk-Real-AI/dingtalk-workspace-cli/internal/output"
 	"github.com/DingTalk-Real-AI/dingtalk-workspace-cli/internal/testseam"
 	"github.com/DingTalk-Real-AI/dingtalk-workspace-cli/pkg/edition"
@@ -19,23 +20,33 @@ import (
 )
 
 type aicardCaller struct {
-	calls    []string
-	sent     map[string]any
-	response string
-	userID   string
-	sendErr  error
+	calls      []string
+	sent       map[string]any
+	response   string
+	userID     string
+	sendErr    error
+	profileErr error
+	resolveErr error
 }
 
 func (c *aicardCaller) CallTool(_ context.Context, product, tool string, args map[string]any) (*edition.ToolResult, error) {
 	c.calls = append(c.calls, product+"/"+tool)
 	text := c.response
 	if tool == "get_current_user_profile" {
+		if c.profileErr != nil {
+			return nil, c.profileErr
+		}
 		text = `{"result":{"userId":"DAAAAAAAAAAAiE"}}`
 		if c.userID != "" {
 			text = `{"result":{"userId":"` + c.userID + `"}}`
 		}
 	} else if tool == "get_user_info_by_user_ids" {
+		if c.resolveErr != nil {
+			return nil, c.resolveErr
+		}
 		text = `{"result":[{"userId":"employee-1","openDingTalkId":"DAAAAAAAAAAAiE"}]}`
+	} else if tool == "search_contact_by_key_word" && c.resolveErr != nil {
+		text = `{"result":[]}`
 	} else {
 		c.sent = args
 		if c.sendErr != nil {
@@ -63,7 +74,7 @@ func executeAicard(t *testing.T, caller *aicardCaller, args ...string) (map[stri
 	root.SilenceErrors = true
 	root.SetArgs(args)
 	ctx, _ := output.WithResultStore(context.Background())
-	cmd, err := root.ExecuteContextC(ctx)
+	cmd, err := corecmd.ExecuteContextCForTest(root, ctx)
 	if err != nil {
 		return nil, -1, err
 	}
@@ -91,7 +102,7 @@ func aicardTestFile(t *testing.T, contents string) string {
 
 const aicardTestSnapshot = `[{"version":"v1.0","createSurface":{"surfaceId":"s","catalogId":"https://dingtalk.com/card/a2ui/catalogs/public/catalog.json","dataModel":{}}},{"version":"v1.0","updateComponents":{"surfaceId":"s","components":[{"id":"root","component":"Text","text":"中文 \"引号\"\n换行"}]}}]`
 
-func TestAicardCommandSurface(t *testing.T) {
+func TestCrossPlatformCoverageAicardCommandSurface(t *testing.T) {
 	root := newAicardCommand()
 	want := map[string]int{"lint": 5, "explain": 1, "preview": 2}
 	for _, cmd := range root.Commands() {
@@ -114,7 +125,7 @@ func TestAicardCommandSurface(t *testing.T) {
 	}
 }
 
-func TestAicardPositionalsAndFlags(t *testing.T) {
+func TestCrossPlatformCoverageAicardPositionalsAndFlags(t *testing.T) {
 	for _, args := range [][]string{{"explain"}, {"lint", "card.json"}, {"preview", "x"}, {"lint", "--strict"}, {"lint", "--explain", "Text"}, {"lint", "--lock-file", "x"}, {"preview", "--open-dingtalk-id", "x"}} {
 		t.Run(strings.Join(args, " "), func(t *testing.T) {
 			_, _, err := executeAicard(t, &aicardCaller{}, args...)
@@ -131,7 +142,7 @@ func TestAicardPositionalsAndFlags(t *testing.T) {
 	}
 }
 
-func TestAicardLocalCommands(t *testing.T) {
+func TestCrossPlatformCoverageAicardLocalCommands(t *testing.T) {
 	caller := &aicardCaller{}
 	for _, name := range []string{"Tabs", "promptText", "ColorToken", "common_red1_color", "Action"} {
 		result, code, err := executeAicard(t, caller, "explain", name)
@@ -155,7 +166,7 @@ func TestAicardLocalCommands(t *testing.T) {
 	}
 }
 
-func TestAicardLintEncodingAndFailure(t *testing.T) {
+func TestCrossPlatformCoverageAicardLintEncodingAndFailure(t *testing.T) {
 	file := aicardTestFile(t, aicardTestSnapshot)
 	result, code, err := executeAicard(t, &aicardCaller{}, "lint", "--file", file, "--emit")
 	if err != nil || code != 0 {
@@ -177,7 +188,7 @@ func TestAicardLintEncodingAndFailure(t *testing.T) {
 	}
 }
 
-func TestAicardPreviewDryRunAndNoSilentInitialization(t *testing.T) {
+func TestCrossPlatformCoverageAicardPreviewDryRunAndNoSilentInitialization(t *testing.T) {
 	caller := &aicardCaller{}
 	file := aicardTestFile(t, aicardTestSnapshot)
 	before, _ := os.ReadFile(file)
@@ -196,7 +207,7 @@ func TestAicardPreviewDryRunAndNoSilentInitialization(t *testing.T) {
 	}
 }
 
-func TestAicardPreviewRequestAndReceipt(t *testing.T) {
+func TestCrossPlatformCoverageAicardPreviewRequestAndReceipt(t *testing.T) {
 	file := aicardTestFile(t, aicardTestSnapshot)
 	for _, response := range []string{`{"success":true,"result":{"bizId":"b","openTaskId":"t"}}`, `{"success":false,"errorCode":"DENIED"}`, `{}`} {
 		caller := &aicardCaller{response: response}
@@ -215,6 +226,9 @@ func TestAicardPreviewRequestAndReceipt(t *testing.T) {
 				t.Fatal(result)
 			}
 			data := result["data"].(map[string]any)
+			if data["bizId"] != "b" || data["bizCardId"] != caller.sent["bizCardId"] || data["bizId"] == data["bizCardId"] || data["updateWarning"] != nil {
+				t.Fatal("preview must distinguish the server update ID from the request ID", data)
+			}
 			if data["requestAccepted"] != true || data["deliveryVerified"] != false || data["renderingVerified"] != false {
 				t.Fatal(data)
 			}
@@ -230,7 +244,55 @@ func TestAicardPreviewRequestAndReceipt(t *testing.T) {
 	}
 }
 
-func TestAicardPreviewResolvesSelfAndPreservesUnknownDelivery(t *testing.T) {
+func TestCrossPlatformCoverageAicardPreviewNormalizesUpdateIDWithoutChangingReceipt(t *testing.T) {
+	file := aicardTestFile(t, aicardTestSnapshot)
+	caller := &aicardCaller{response: `{"success":true,"result":{"bizId":"  opaque-card-token  "}}`}
+	result, code, err := executeAicard(t, caller, "preview", "--file", file)
+	if err != nil || code != 0 {
+		t.Fatalf("%v %d %v", result, code, err)
+	}
+	data := result["data"].(map[string]any)
+	if data["bizId"] != "opaque-card-token" || data["updateWarning"] != nil {
+		t.Fatal("preview must expose the normalized update ID", data)
+	}
+	receipt := data["receipt"].(map[string]any)
+	if receipt["result"].(map[string]any)["bizId"] != "  opaque-card-token  " {
+		t.Fatal("preview must preserve the original receipt", receipt)
+	}
+}
+
+func TestCrossPlatformCoverageAicardPreviewMissingUpdateID(t *testing.T) {
+	file := aicardTestFile(t, aicardTestSnapshot)
+	for _, response := range []string{
+		`{"success":true}`,
+		`{"success":true,"result":[]}`,
+		`{"success":true,"result":{"bizId":42}}`,
+		`{"success":true,"result":{"bizId":""}}`,
+		`{"success":true,"result":{"bizId":"  "}}`,
+		`{"success":true,"result":{"bizId":"wrong id"}}`,
+		`{"success":true,"result":{"bizId":"<bizId>"}}`,
+	} {
+		t.Run(response, func(t *testing.T) {
+			caller := &aicardCaller{response: response}
+			result, code, err := executeAicard(t, caller, "preview", "--file", file)
+			if err != nil || code != 0 {
+				t.Fatalf("accepted creation must not become a retryable failure: %v %d %v", result, code, err)
+			}
+			data := result["data"].(map[string]any)
+			if _, exists := data["bizId"]; exists {
+				t.Fatal("invented an update ID", data)
+			}
+			if data["requestAccepted"] != true || data["flowStatus"] != "PROCESSING" || data["updateWarning"] == nil || data["receipt"] == nil || data["bizCardId"] != caller.sent["bizCardId"] {
+				t.Fatal("missing accepted-creation recovery information", data)
+			}
+			if len(caller.calls) != 2 || caller.calls[1] != "im/create_and_send_a2ui_card" {
+				t.Fatal("preview must not retry creation or finish automatically", caller.calls)
+			}
+		})
+	}
+}
+
+func TestCrossPlatformCoverageAicardPreviewResolvesSelfAndPreservesUnknownDelivery(t *testing.T) {
 	file := aicardTestFile(t, aicardTestSnapshot)
 	caller := &aicardCaller{userID: "employee-1", response: `{"success":true,"result":{"cardInstanceId":"card-1"}}`}
 	result, code, err := executeAicard(t, caller, "preview", "--file", file)
@@ -266,7 +328,7 @@ func TestAicardPreviewResolvesSelfAndPreservesUnknownDelivery(t *testing.T) {
 	}
 }
 
-func TestAicardBatchAndExplicitPreflight(t *testing.T) {
+func TestCrossPlatformCoverageAicardBatchAndExplicitPreflight(t *testing.T) {
 	caller := &aicardCaller{}
 	result, code, err := executeAicard(t, caller, "explain", "Text", "Tabs", "--compact")
 	if err != nil || code != 0 || result["data"].(map[string]any)["kind"] != "bundle" {
@@ -283,5 +345,35 @@ func TestAicardBatchAndExplicitPreflight(t *testing.T) {
 	}
 	if len(caller.calls) != 0 {
 		t.Fatal("offline query and lint must not send", caller.calls)
+	}
+}
+
+func TestCrossPlatformCoverageAicardPreviewBase64Warnings(t *testing.T) {
+	for _, dryRun := range []bool{true, false} {
+		caller := &aicardCaller{response: `{"success":true}`}
+		file := aicardTestFile(t, `[{"version":"v1.0","createSurface":{"surfaceId":"s","catalogId":"https://dingtalk.com/card/a2ui/catalogs/public/catalog.json","dataModel":{},"components":[{"id":"root","component":"Image","url":"data:image/png;base64,YQ=="}]}}]`)
+		before, _ := os.ReadFile(file)
+		args := []string{"preview", "--file", file}
+		if dryRun {
+			args = append(args, "--dry-run")
+		}
+		result, code, err := executeAicard(t, caller, args...)
+		if err != nil || code != 0 {
+			t.Fatalf("%v code=%d err=%v", result, code, err)
+		}
+		data := result["data"].(map[string]any)
+		preflight := data["preflight"].(map[string]any)
+		diagnostics := preflight["diagnostics"].([]any)
+		if preflight["valid"] != true || len(diagnostics) != 1 || data["renderingVerified"] != false {
+			t.Fatal(data)
+		}
+		warning := diagnostics[0].(map[string]any)
+		if warning["code"] != "resource.base64_image_unverified" || warning["severity"] != "warning" {
+			t.Fatal(warning)
+		}
+		after, _ := os.ReadFile(file)
+		if !bytes.Equal(before, after) || (dryRun && len(caller.calls) != 0) {
+			t.Fatal("preview changed the input or dry-run called the service")
+		}
 	}
 }

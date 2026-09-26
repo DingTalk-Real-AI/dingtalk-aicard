@@ -27,6 +27,7 @@ STATE_REL = Path('shared/.protocol-sync.json')
 DEFAULT_SOURCE = ROOT / 'spec'
 SKILL_PROTOCOL = Path('skills/dingtalk-aicard/references/protocol')
 GO_ASSETS = Path('dws-aicard/internal/card/a2ui/assets.json')
+GO_EXPLAIN = Path('dws-aicard/internal/card/a2ui/explain.json')
 REPOSITORY_DOCS = ('README.md', 'CONTRIBUTING.md')
 PROTOCOL_FILES = (
     'catalog-components-common.json', 'catalog-components-composition.json',
@@ -54,23 +55,54 @@ def digest(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
-def skill_examples_readme(content):
-    """Distribute the scenario index but point its creation guidance to the Skill entry point."""
-    text = content.decode('utf-8')
-    source = ('See [Surface initialization and updates](../README.md#surface-initialization-and-updates) '
-              'for delivery boundaries.')
-    target = 'See [Surface and delivery scenarios](../../../SKILL.md) for delivery boundaries.'
-    if text.count(source) != 1:
-        raise ValueError('Surface guidance in the protocol example index changed; update the Skill projection rule')
-    text = text.replace(source, target)
-    return text.encode('utf-8')
+def imported_bytes(relative_path, source):
+    """Keep maintainer metadata upstream, not on the public repository homepage."""
+    content = Path(source).read_bytes()
+    if Path(relative_path) == Path('README.md'):
+        opening = re.match(br'\A(?:\xef\xbb\xbf)?---\r?\n', content)
+        if opening:
+            closing = re.search(br'^---\r?$(?:\n|\Z)', content[opening.end():], re.MULTILINE)
+            if not closing:
+                raise ValueError('Repository README has unterminated front matter')
+            content = content[opening.end() + closing.end():].lstrip(b'\r\n')
+    return content
+
+
+EXAMPLE_GUIDANCE = {
+    'form-interaction.json': ('Form bindings, upload events, and submit checks', 'form.md'),
+    'host-action.json': ('Host dialog and result writeback', 'form.md#example-interaction-notes'),
+    'agent-run-progress.json': ('Running state with generation effects and tool icons', 'progress.md'),
+    'agent-run.json': ('Execution updates through completion', 'progress.md'),
+    'data-report.json': ('Tabs, table pagination, charts, Loop, and Stack', 'report.md'),
+}
+
+
+def skill_examples_readme(example_names):
+    """Build Skill-owned navigation independently of imported README prose."""
+    names = set(example_names)
+    if names != set(EXAMPLE_GUIDANCE):
+        raise ValueError('Skill example guidance does not match JSON files: '
+                         f'unmapped={sorted(names - set(EXAMPLE_GUIDANCE))}; '
+                         f'missing={sorted(set(EXAMPLE_GUIDANCE) - names)}')
+    lines = ['# Choose an example', '',
+             'Read only the matching JSON. Adapt its content and layout to the task.', '',
+             '| Need | JSON example | Guidance |', '|---|---|---|']
+    for name, (need, pattern) in EXAMPLE_GUIDANCE.items():
+        label = pattern.split('.')[0].capitalize()
+        lines.append(f'| {need} | [{name}]({name}) | [{label}](../../patterns/{pattern}) |')
+    lines += ['', 'Execution replay requires the [batch instructions](../../patterns/progress.md#examples-and-replay); '
+              'sending the whole array at once may hide intermediate states.', '',
+              'These arrays initialize new cards. For existing cards, send only intended changes, not initialization. '
+              'See [Construct and validate](../../../SKILL.md#construct-and-validate) for creation and update scenarios.', '']
+    return '\n'.join(lines).encode('utf-8')
 
 
 def skill_protocol_contents(root):
     source = root / 'spec'
     names = {Path(n) for n in SKILL_PROTOCOL_FILES}
     names.update(Path('examples') / p.name for p in (source / 'examples').iterdir() if p.is_file())
-    return {rel: skill_examples_readme((source / rel).read_bytes()) if rel == Path('examples/README.md')
+    index = skill_examples_readme(p.name for p in (source / 'examples').glob('*.json'))
+    return {rel: index if rel == Path('examples/README.md')
             else (source / rel).read_bytes() for rel in sorted(names)}
 
 
@@ -120,7 +152,8 @@ def plan_sync(root, groups, state):
     for key, sources in groups.items():
         dest = DESTINATIONS[key]
         recorded = state.get('files', {}).get(key, {})
-        files[key] = {name: digest(path) for name, path in sources.items()}
+        files[key] = {name: hashlib.sha256(imported_bytes(dest / name, path)).hexdigest()
+                      for name, path in sources.items()}
         names = set(sources) | set(recorded)
         if key in ('protocol_examples', 'examples'):
             unexpected.extend(str(p.relative_to(root)) for p in sorted((root / dest).glob('*.json'))
@@ -151,6 +184,7 @@ def run_check(command, cwd, env):
 
 def managed_paths(root):
     paths = {STATE_REL, GO_ASSETS, *(Path(n) for n in REPOSITORY_DOCS), Path('skills/dingtalk-aicard/scripts') / RULES_NAME}
+    paths.add(GO_EXPLAIN)
     for directory in ('spec', 'skills/dingtalk-aicard/references/protocol', 'skills/dingtalk-aicard/references/index',
                       'shared/fixtures/valid', 'dws-aicard/skills/multi/dingtalk-aicard'):
         paths.update(p.relative_to(root) for p in (root / directory).rglob('*') if p.is_file())
@@ -205,6 +239,7 @@ def publish(root, candidate, before):
 
 def generated_paths(root):
     paths = {GO_ASSETS}
+    paths.add(GO_EXPLAIN)
     for directory in (str(SKILL_PROTOCOL), 'skills/dingtalk-aicard/references/index', 'dws-aicard/skills/multi/dingtalk-aicard'):
         paths.update(p.relative_to(root) for p in (root / directory).rglob('*')
                      if p.is_file() and p.name != '.DS_Store' and '__pycache__' not in p.parts)
@@ -298,6 +333,7 @@ def synchronize(root, source, rules, *, conformance=None, check=False, force=Fal
         # Rebuilds must not silently re-register release inputs; generator changes may rebuild derived files.
         check_local_inputs(root, generated=False, skill=False)
     groups = source_groups(source, rules, conformance, fixture_index=not local, repository_docs=repository_docs)
+    source_hashes = {k: {n: digest(p) for n, p in g.items()} for k, g in groups.items()}
     changes, tampered, files, unexpected = plan_sync(root, groups, state)
     if repository_docs is None and 'repository_docs' in state.get('files', {}):
         # Omitting a documentation source means no documentation update, not removal of existing digest protection.
@@ -358,7 +394,8 @@ def synchronize(root, source, rules, *, conformance=None, check=False, force=Fal
                 target.unlink(missing_ok=True)
             else:
                 target.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copy2(src, target)
+                target.write_bytes(imported_bytes(rel, src))
+                shutil.copymode(src, target)
         target = candidate / SKILL_PROTOCOL
         if target.exists():
             shutil.rmtree(target)
@@ -369,7 +406,7 @@ def synchronize(root, source, rules, *, conformance=None, check=False, force=Fal
         (candidate / STATE_REL).write_text(json.dumps(release_state(files, state, notice=(candidate / 'spec/NOTICE').read_text()), ensure_ascii=False, indent=2) + '\n')
         validate_candidate(candidate, official, skip_conformance)
         current = source_groups(source, rules, conformance, fixture_index=not local, repository_docs=repository_docs)
-        if {k: {n: digest(p) for n, p in g.items()} for k, g in current.items()} != {k: files[k] for k in current}:
+        if {k: {n: digest(p) for n, p in g.items()} for k, g in current.items()} != source_hashes:
             raise ValueError('Upstream resources changed during validation; rerun sync')
         publish(root, candidate, before)
     print('Protocol, rules, indexes, DWS Skill, and Go assets were updated as one release snapshot.')
@@ -384,9 +421,29 @@ def main(argv=None):
     parser.add_argument('--repository-docs', type=Path, help='Source directory for README.md / CONTRIBUTING.md during import')
     parser.add_argument('--official', type=Path, help='Official A2UI 1.0 conformance case directory')
     parser.add_argument('--check', action='store_true')
+    parser.add_argument('--refresh-generated', action='store_true',
+                        help='Recompute only generated digests after checking unchanged managed sources and generators')
     parser.add_argument('--force', action='store_true', help='Explicitly discard local edits to managed generated files')
     parser.add_argument('--skip-conformance', action='store_true', help='Skip only the full test suite; keep self-check, generation, and digest verification')
     args = parser.parse_args(argv)
+    if args.refresh_generated:
+        if any((args.source, args.conformance_source, args.validation_rules, args.repository_docs,
+                args.official, args.check, args.force, args.skip_conformance)):
+            parser.error('--refresh-generated cannot be combined with import or sync options')
+        try:
+            check_local_inputs(ROOT, generated=False)
+            env = dict(os.environ, PYTHONDONTWRITEBYTECODE='1')
+            for script in ('build_index.py', 'build_dws_skill.py', 'build_go_assets.py'):
+                run_check([sys.executable, '-B', 'tools/' + script, '--check'], ROOT, env)
+            state = load_state(ROOT)
+            state['generated'] = {str(p): digest(ROOT / p) for p in sorted(generated_paths(ROOT))}
+            replace_file(ROOT / STATE_REL, (json.dumps(state, ensure_ascii=False, indent=2) + '\n').encode('utf-8'))
+            check_local_inputs(ROOT)
+            print('Refreshed generated digests without changing managed protocol or repository documentation.')
+            return 0
+        except (OSError, ValueError) as error:
+            print(str(error), file=sys.stderr)
+            return 2
     local = args.source is None
     if local and any((args.conformance_source, args.validation_rules, args.repository_docs)):
         parser.error('External rules, baselines, and documentation sources require --source')

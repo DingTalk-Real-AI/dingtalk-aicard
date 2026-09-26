@@ -12,13 +12,16 @@ shared/.dws-install.json
 .aicard-setup-*/
 /.pytest_cache/
 /.analysis-artifacts/
+/output/
 
-# Private Skill evaluation inputs, workspaces, and results; never distribute with the Skill.
-/evals/data/
-/evals/work/
-/evals/results/
+# Local browser automation artifacts.
+/.playwright-mcp/
 
-# Ignore obsolete paths written by older tools; evals/ is the maintained entrypoint.
+# Evaluation tooling and local runs are excluded from this public checkout.
+/eval/
+/evals/
+
+# Ignore obsolete evaluation paths written by older tools.
 /eval-data/
 /.eval-work/
 /eval-results/
@@ -26,5 +29,6 @@ shared/.dws-install.json
 # Temporary sync candidates; commit the canonical shared/.protocol-sync.json.
 /.protocol-sync-*/
 
-# Locally packaged Skill archive, including possible macOS resource forks.
+# Locally packaged Skill archives, including possible macOS resource forks.
 /skills/dingtalk-aicard.zip
+/dist/

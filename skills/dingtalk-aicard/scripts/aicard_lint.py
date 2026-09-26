@@ -1446,6 +1446,8 @@ def preflight(messages, protocol, mode='new-card'):
                 resource(value, pointer + '/' + str(index), field)
         elif isinstance(node, str) and field in resource_keys and node.lower().startswith('data:'):
             header, sep, content = node.partition(',')
+            if header.lower().startswith('data:image/') and ';base64' in header.lower():
+                diagnostics.append(Diagnostic('resource.base64_image_unverified', 'warning', pointer, 'Base64 image compatibility and operation size are unverified; prefer a verified HTTPS image URL'))
             if not sep or re.search(r'%(?![0-9a-fA-F]{2})', content):
                 error('resource.invalid_data_uri', pointer, 'The data URI lacks a separator or contains invalid escaping')
                 return

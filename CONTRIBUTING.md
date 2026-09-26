@@ -47,7 +47,7 @@ Use explicit upstream paths. Keep matching public resources, supplementary rules
   --repository-docs /path/to/card-docs/reference/dingtalk-aicard-public
 ```
 
-The importer prepares a repository-local candidate, validates it, regenerates all derived artifacts, checks for concurrent input changes, and publishes with rollback on write failure. The documented sources of the repository README and this guide are imported with `--repository-docs`.
+The importer prepares a repository-local candidate, validates it, regenerates all derived artifacts, checks for concurrent input changes, and publishes with rollback on write failure. The documented sources of the repository README and this guide are imported with `--repository-docs`. The public root README omits its source's leading YAML front matter; upstream metadata remains intact. Its manifest hash covers the exported content. Other documentation is copied unchanged.
 
 ## Official reference and release checks
 

@@ -44,29 +44,25 @@ metadata:
 
 
 DWS_EXECUTION_BLOCKS = {
-    "runtime": """This edition uses native DWS commands for lookup, validation, and preview; it does not need Python or the standalone Skill's scripts. On first use or an unrecognized command, run `dws aicard --help` to confirm that the binary provides `explain`, `lint`, and `preview`. Copying Skill files does not install commands in an older binary.
-
-`explain` and `lint` use the embedded protocol offline and need no Profile. Check `dws aicard explain --help` before a batch or compact query; query names individually if unsupported. Follow the current command help. Use `dws aicard explain` for lookup, not `dws aicard lint --explain`. Inspect the exit code, `ok`, and `outcome`: successful content is in `data`, failures in `error`, and structural diagnostics in `error.details`.
-
-If a command is missing, use a DWS build that includes aicard. Preserve the actual error if embedded protocol loading fails and inspect the DWS installation. When temporarily unavailable, the indexes can still guide a draft; state that DWS validation was not run. Do not present Python or manual checks as a DWS validation result.""",
+    "runtime": """This edition uses native DWS commands, not Python. Confirm `dws aicard --help` exposes `explain`, `lint`, and `preview`; copying the Skill does not install commands. Lookup and lint are offline and need no Profile. Check each command's current help and structured envelope (`ok`, `outcome`, `data`, or `error.details`). If unavailable, references can guide a draft, but do not claim DWS validation.""",
     "query": """```bash
 dws aicard explain Tabs --format json
 dws aicard explain Text Row Column --compact --format json
 ```""",
-    "lint": """Validate this file:
-
-```bash
+    "lint": """```bash
 dws aicard lint --file card.a2ui.json --format json
 ```
 
-Add `--preflight new-card` for a new card, or `--preflight resources` to check inline resources in a delta or host-created content. Confirm option support with `dws aicard lint --help`; an older binary cannot claim to have run preflight.
+Choose `--preflight new-card` or `--preflight resources` for the selected scenario, and use `--emit` only when serialized message strings are needed; it cannot be combined with `--fragment`. Check exit status and `data.valid` plus `data.preflight.valid` when selected. `dws aicard lint --self-check --format json` verifies the full package.""",
+    "delivery": """With native `--emit`, read `data.a2uiMessages`.
 
-Read `data.valid` on success, plus `data.preflight.valid` and diagnostics when preflight is enabled. Warnings do not block. Structural or preflight errors cause a nonzero exit with details in `error.details`; `valid` still refers only to Schema checks. An environment or read failure is not a pass.
+Send only when requested. Resolve exactly one target under the sending profile: `--conversation-id` for a conversation or `--open-dingtalk-id` for a person. Names are not target IDs. Inspect installed command help, JSON-encode the emitted message-string array as one `--content` argument, and call `dws chat message send-a2ui-card`. Preserve the request, target, profile and returned `bizId`. An uncertain result must be checked before another create; do not resend automatically.
 
-Add `--emit` when the sending layer needs an array of message strings. After structural validation, `data.a2uiMessages` contains individually serialized messages. JSON-encode the whole array for the sending parameter; do not hand-write shell escaping. `--fragment` and `--emit` are mutually exclusive. Run `dws aicard lint --self-check --format json` separately to check embedded protocol integrity.""",
-    "delivery": """If the user requests a preview sent to themselves, use `dws aicard preview --file card.a2ui.json`. It really sends a card and requires a complete new-card sequence. `--dry-run` checks the local sending boundary without resolving identity or sending. To send to another person or a group, follow the current `dws chat message send-a2ui-card` contract for target and parameters.
+Creation starts in PROCESSING. Update with `dws chat message update-a2ui-card --biz-id <bizId> --content <message-strings> --flow-status <state>` under the original profile. Keep the same `surfaceId` and component IDs; send only intended `updateDataModel` or `updateComponents` changes, not another `createSurface` or unrelated defaults. Static cards require `--flow-status FINISH` with a nonempty valid delta; prepare it before sending and preserve business data. Stream complete messages, not JSON tokens. Resource preflight checks only the delta. If current state is known, validate it with the delta; Schema validity does not prove business safety.
 
-`preview` reports `success` only when the card creation request is explicitly accepted, even if its receipt contains `openTaskId`. Keep that ID in the receipt, but do not pass it to `dws chat message query-send-status`, which is for current-user message sends. `deliveryVerified` and `renderingVerified` remain `false`. Conversation readback is separate evidence; generic card text and a nearby timestamp do not uniquely identify this card. The default sending status is `PROCESSING`. Update or finish through `dws chat message update-a2ui-card`, locating the original card by `bizId` without replaying creation. Investigate an unknown result before retrying; a receipt is not client acceptance evidence.""",
+`dws aicard preview --file card.a2ui.json` sends a self-preview in PROCESSING; `--dry-run` does not send. For a completed static preview, finish it under the same profile with `dws chat message update-a2ui-card --biz-id <data.bizId> --content <message-strings> --flow-status FINISH`, using a nonempty state-preserving delta for the same Surface. Do not replay form defaults. Use server-issued `data.bizId`, never request-side `bizCardId`. If absent, inspect `updateWarning` and the receipt; do not recreate automatically. `openTaskId` cannot be used with `query-send-status`.
+
+After sending, use the available readback capability under the same profile and target to identify this exact card from returned instance/message identifiers. Generic card text and a nearby timestamp are not sufficient. Report request acceptance, same-target readback, client rendering and interaction separately. If readback is unavailable or inconclusive, mark it unverified; do not claim the user received or correctly rendered the card from API acceptance alone.""",
 }
 
 def read(path):

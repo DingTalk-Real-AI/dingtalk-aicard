@@ -12,6 +12,15 @@ import (
 	"github.com/santhosh-tekuri/jsonschema/v6"
 )
 
+func mustExplain(t *testing.T, p *Protocol, name string) map[string]any {
+	t.Helper()
+	result, err := p.Explain(name)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return result
+}
+
 func testProtocol(t *testing.T) *Protocol {
 	t.Helper()
 	source, err := fs.Sub(skills.FS, "multi/dingtalk-aicard")
@@ -25,10 +34,18 @@ func testProtocol(t *testing.T) *Protocol {
 	return p
 }
 
-func TestAicardAllExplainExamples(t *testing.T) {
+func TestCrossPlatformCoverageAicardAllExplainExamples(t *testing.T) {
 	p := testProtocol(t)
-	for name, expected := range p.assets.Explain {
-		result := p.Explain(name)
+	store, err := BundledExplain()
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, name := range store.Names() {
+		expected, err := store.Lookup(name)
+		if err != nil {
+			t.Fatal(err)
+		}
+		result := mustExplain(t, p, name)
 		if result["name"] != name || result["kind"] != expected["kind"] {
 			t.Fatal(name, result)
 		}
@@ -41,13 +58,13 @@ func TestAicardAllExplainExamples(t *testing.T) {
 			t.Fatalf("%s: %v %+v", name, err, r.Diagnostics)
 		}
 	}
-	unknown := p.Explain("Tabss")
+	unknown := mustExplain(t, p, "Tabss")
 	if unknown["kind"] != "unknown" || len(unknown["suggestions"].([]string)) == 0 {
 		t.Fatal(unknown)
 	}
 }
 
-func TestAicardNestedFunctionsAndStructuralDiagnostics(t *testing.T) {
+func TestCrossPlatformCoverageAicardNestedFunctionsAndStructuralDiagnostics(t *testing.T) {
 	p := testProtocol(t)
 	var visible any = map[string]any{"path": "/ready"}
 	for i := 0; i < 10; i++ {
@@ -74,7 +91,7 @@ func TestAicardNestedFunctionsAndStructuralDiagnostics(t *testing.T) {
 	}
 }
 
-func TestAicardUnicodeExtensionNames(t *testing.T) {
+func TestCrossPlatformCoverageAicardUnicodeExtensionNames(t *testing.T) {
 	p := testProtocol(t)
 	for _, tc := range []struct {
 		name  string
@@ -89,9 +106,9 @@ func TestAicardUnicodeExtensionNames(t *testing.T) {
 	}
 }
 
-func TestAicardButtonGroupWritebackOwner(t *testing.T) {
+func TestCrossPlatformCoverageAicardButtonGroupWritebackOwner(t *testing.T) {
 	p := testProtocol(t)
-	writeback := object(p.Explain("ButtonGroup")["hostWriteback"])
+	writeback := object(mustExplain(t, p, "ButtonGroup")["hostWriteback"])
 	if writeback["path"] != "buttons[].metadata.extensions.dt_actionBindingsV1.action.resultPath" {
 		t.Fatal(writeback)
 	}
@@ -101,7 +118,7 @@ func TestAicardButtonGroupWritebackOwner(t *testing.T) {
 	}
 }
 
-func TestAicardSyntaxAndShape(t *testing.T) {
+func TestCrossPlatformCoverageAicardSyntaxAndShape(t *testing.T) {
 	p := testProtocol(t)
 	for _, s := range []string{"[]", "{}", "null", "[NaN]", "[] []", "[1]"} {
 		r, err := p.Lint([]byte(s), false, false)
@@ -122,7 +139,7 @@ func TestAicardSyntaxAndShape(t *testing.T) {
 	}
 }
 
-func TestAicardUTF8BOMInput(t *testing.T) {
+func TestCrossPlatformCoverageAicardUTF8BOMInput(t *testing.T) {
 	p := testProtocol(t)
 	payload := []byte(`{"id":"root","component":"Text","text":"ok"}`)
 	withBOM := append([]byte{0xef, 0xbb, 0xbf}, payload...)
@@ -135,7 +152,7 @@ func TestAicardUTF8BOMInput(t *testing.T) {
 	}
 }
 
-func TestAicardNewCardBoundary(t *testing.T) {
+func TestCrossPlatformCoverageAicardNewCardBoundary(t *testing.T) {
 	p := testProtocol(t)
 	create := `{"version":"v1.0","createSurface":{"surfaceId":"s","catalogId":"https://dingtalk.com/card/a2ui/catalogs/public/catalog.json"}}`
 	update := `{"version":"v1.0","updateComponents":{"surfaceId":"s","components":[{"id":"root","component":"Text","text":"正文"}]}}`
@@ -149,7 +166,7 @@ func TestAicardNewCardBoundary(t *testing.T) {
 	}
 }
 
-func TestAicardConstantGuardPreservesCombinationSemantics(t *testing.T) {
+func TestCrossPlatformCoverageAicardConstantGuardPreservesCombinationSemantics(t *testing.T) {
 	schema := `{"$schema":"https://json-schema.org/draft/2020-12/schema","allOf":[{"type":"object","properties":{"id":{"type":"string"}},"required":["id"]},{"oneOf":[{"properties":{"call":{"const":"a"},"args":{"type":"object","properties":{"value":{"type":"boolean"}},"required":["value"],"unevaluatedProperties":false}},"required":["call","args"]},{"properties":{"call":{"const":"b"},"args":{"type":"number"}},"required":["args"]}]}],"unevaluatedProperties":false}`
 	original, _ := decode([]byte(schema))
 	copy, _ := decode([]byte(schema))

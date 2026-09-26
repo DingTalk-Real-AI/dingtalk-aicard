@@ -24,7 +24,7 @@ This is the **V0.8 specification prepared for publication** of DingTalk AI Card,
 | Skill `protocolVersion: "1.0"` | The compatible A2UI wire format, retained for compatibility |
 | `catalogId` / Schema `$id` | Runtime / Schema resource identity, not a release number or automatic download instruction |
 
-The public Schemas and requirements in this document jointly define the contract. The examples are explanatory. Lint implements statically checkable requirements using these Schemas and version-matched supplementary rules; its implementation must not introduce undocumented requirements. Passing lint does not establish runtime success or client support.
+The public Schemas and requirements in this document jointly define the contract. The examples are explanatory. Lint implements statically checkable requirements using these Schemas and version-matched supplementary rules; its implementation must not introduce undocumented requirements. Passing lint does not establish successful delivery, rendering, or interaction for a particular payload.
 
 This repository layout does not change fields or runtime identifiers. Publish incompatible contract changes under an explicit new specification release with migration and identifier changes documented. Retain prior releases; additions must state client support rather than imply availability on older clients.
 
@@ -150,9 +150,11 @@ The seven catalogs use the official catalog structure, but this package is a Din
 | Common types and references | DingTalk types and relative `$ref` targets extend the upstream catalog's textual type whitelist. The common-type files cannot replace upstream `common_types.json`. |
 | Visual fields | Numeric sizes such as `gap`, `padding` and `cornerRadius` are in px; host-resolved ColorToken IDs have no fixed protocol color or opacity. These are DingTalk-specific visual controls. |
 | Host features | Host functions, user/conversation pickers, uploads and `@` mentions depend on DingTalk integration. `<a atId>` currently falls back to plain text without server-side ID resolution. |
-| Accessibility | The field is accepted by validation, but client screen-reader behavior has not been established by this distribution. Do not claim it works from Schema acceptance alone. |
+| Accessibility | Supply meaningful accessibility metadata for assistive technologies. Schema validation checks its structure, not label quality or the usability of a particular card. |
 
-Component fields are closed by `unevaluatedProperties: false`; undeclared fields fail validation. The Schema validates structure, not content security: URL schemes, Markdown filtering and host authorization need integration-side policy. A catalog entry, static lint result or successful request does not prove delivery, rendering or interaction. This distribution has no verified client/version matrix for iOS, Android, HarmonyOS, Windows, macOS or Web; record exact payload, client version and observed result before claiming support.
+DingTalk AI Card's published components, functions, expressions, events, and visual effects support rendering and interaction on **iOS, Android, HarmonyOS, Windows, macOS, and Web**.
+
+Component fields are closed by `unevaluatedProperties: false`; undeclared fields fail validation. The Schema validates structure, not content security: URL schemes, Markdown filtering and host authorization need integration-side policy. A catalog entry, static lint result or successful request does not prove delivery, rendering or interaction.
 
 ### Terms
 
