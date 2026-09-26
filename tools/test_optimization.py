@@ -68,10 +68,27 @@ class OptimizationTests(unittest.TestCase):
         c.pop('text')
         for url in ['data:image/jpeg;base64,/Users/test: error\n/9j/', 'data:image/png;base64,', 'data:image/png;base64,%GG']:
             c['url'] = url
-            self.assertTrue(self.codes(self.card))
-        for url in ['data:image/png;base64,YQ==', 'data:image/svg+xml,%3Csvg/%3E', 'dingtalk://some-media']:
+            self.assertFalse(m.preflight(self.card, self.p)['valid'])
+        for url in ['data:image/svg+xml,%3Csvg/%3E', 'dingtalk://some-media', 'https://example.com/preview.png']:
             c['url'] = url
             self.assertFalse(self.codes(self.card))
+
+    def test_valid_base64_images_warn_without_rejecting_resource_fields(self):
+        for field in ['url', 'darkUrl', 'imageUrl', 'posterUrl', 'coverUrl', 'images']:
+            with self.subTest(field=field):
+                c = self.components['updateComponents']['components'][0]
+                c.clear()
+                value = 'data:image/png;base64,YQ=='
+                c.update(id='root', component='Image', **{field: [value] if field == 'images' else value})
+                for card, mode in ((self.card, 'new-card'), ([self.components], 'resources')):
+                    result = m.preflight(card, self.p, mode)
+                    self.assertTrue(result['valid'])
+                    self.assertFalse(result['renderingVerified'])
+                    self.assertEqual(1, len(result['diagnostics']))
+                    warning = result['diagnostics'][0]
+                    self.assertEqual('resource.base64_image_unverified', warning['code'])
+                    self.assertEqual('warning', warning['severity'])
+                    self.assertTrue(warning['pointer'].endswith('/' + field + ('/0' if field == 'images' else '')))
 
     def test_text_is_not_a_resource(self):
         self.components['updateComponents']['components'][0]['text'] = 'data:image/png;base64,invalid!'

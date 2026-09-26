@@ -210,7 +210,7 @@ def main(argv=None):
 
     scene_dir = os.path.join(ROOT, "skills", "dingtalk-aicard", "references", "protocol", "examples")
     scene_files = sorted(glob.glob(os.path.join(scene_dir, "*.json")))
-    expected_scenes = {"form-interaction.json", "host-action.json", "agent-progress.json", "data-report.json"}
+    expected_scenes = {"form-interaction.json", "host-action.json", "agent-run-progress.json", "agent-run.json", "data-report.json"}
     if {os.path.basename(p) for p in scene_files} != expected_scenes:
         parser.error("Public scenario set is missing files or contains unregistered files; conformance coverage must not shrink")
 
