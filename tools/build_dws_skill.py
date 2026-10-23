@@ -26,9 +26,10 @@ PACKAGE_NOTICES = ("LICENSE", "NOTICE")
 DWS_FRONTMATTER = f"""---
 name: {SKILL_NAME}
 description: >
-  Create, edit, and validate DingTalk AI Card (A2UI) JSON files offline.
-  Use for cards built from requirements or images, structural protocol errors,
-  and named component or function contract lookup through native DWS commands.
+  Create, edit, and validate DingTalk AI Card (A2UI) JSON files with native
+  DWS commands. Use for cards built from requirements or images, structural
+  protocol errors, named component or function contract lookup, and cloud
+  templates created, retrieved, or revised by template ID and version.
   Send a card to the current user only when a preview is requested.
 metadata:
   cli_version: ">=0.2.14"
@@ -44,25 +45,35 @@ metadata:
 
 
 DWS_EXECUTION_BLOCKS = {
-    "runtime": """This edition uses native DWS commands, not Python. Confirm `dws aicard --help` exposes `explain`, `lint`, and `preview`; copying the Skill does not install commands. Lookup and lint are offline and need no Profile. Check each command's current help and structured envelope (`ok`, `outcome`, `data`, or `error.details`). If unavailable, references can guide a draft, but do not claim DWS validation.""",
+    "runtime": """Use native DWS commands. Check `dws aicard --help` for `explain`, `lint`, `preview`, and `template`; copying this Skill does not install them. Lookup and lint are offline and need no Profile. Check leaf help and JSON envelopes (`ok`, `outcome`, `data`, `error.details`). Missing commands permit a draft, never a DWS validation claim.
+
+### Cloud templates
+
+| Intent | Command |
+|---|---|
+| Save a validated card | `dws aicard template create --file <file>` |
+| Read a known ID and version | `dws aicard template get --template-id <id> --version <version> --out <new-file>` |
+| Revise a template | `dws aicard template update --template-id <id> --file <file>` |
+
+Cloud calls need the intended Profile, organization, and environment, plus an explicit `--mcp-id` or `DWS_AICARD_TEMPLATE_MCP_ID`; there is no default. `get` needs a known ID and version, not keywords. To derive a template, get it, edit the file, and create a new one; `update` appends a version under the same ID. Report the returned ID and version; never retry an uncertain write. A read of an absent version may return the latest content, so strict use must match the approved digest.
+
+Use approved business bindings and data paths; do not substitute local samples. Business configuration owns activation and rollback. Send complete new cards or authorized instance deltas; delivery never modifies template assets.""",
     "query": """```bash
 dws aicard explain Tabs --format json
 dws aicard explain Text Row Column --compact --format json
 ```""",
     "lint": """```bash
-dws aicard lint --file card.a2ui.json --format json
+dws aicard lint --file a2ui.json --format json
 ```
 
-Choose `--preflight new-card` or `--preflight resources` for the selected scenario, and use `--emit` only when serialized message strings are needed; it cannot be combined with `--fragment`. Check exit status and `data.valid` plus `data.preflight.valid` when selected. `dws aicard lint --self-check --format json` verifies the full package.""",
-    "delivery": """With native `--emit`, read `data.a2uiMessages`.
+Choose `--preflight new-card` or `--preflight resources` for the selected scenario. Use `--emit` only when serialized message strings are needed; it cannot be combined with `--fragment`. Check exit status, `data.valid`, and `data.preflight.valid` when selected. Fix errors at their diagnostic pointers and rerun the selected check. `dws aicard lint --self-check --format json` verifies the full package.""",
+    "delivery": """Follow the installed dingtalk-chat A2UI guidance for creation, updates, summaries, annotations, and completion; check leaf help for `--summary`, `--support-forward`, and update flags. A missing capability blocks delivery.
 
-Send only when requested. Resolve exactly one target under the sending profile: `--conversation-id` for a conversation or `--open-dingtalk-id` for a person. Names are not target IDs. Inspect installed command help, JSON-encode the emitted message-string array as one `--content` argument, and call `dws chat message send-a2ui-card`. Preserve the request, target, profile and returned `bizId`. An uncertain result must be checked before another create; do not resend automatically.
+Send only when requested. Resolve exactly one target under the sending Profile: `--conversation-id` for a conversation or `--open-dingtalk-id` for a person. Names are not target IDs. JSON-encode the emitted `data.a2uiMessages` as one `--content` argument for `dws chat message send-a2ui-card`, with a readable fallback `--summary` and a policy-based `--support-forward=true|false` (default false). For a card instantiated from a business template, update only the data paths its business configuration authorizes.
 
-Creation starts in PROCESSING. Update with `dws chat message update-a2ui-card --biz-id <bizId> --content <message-strings> --flow-status <state>` under the original profile. Keep the same `surfaceId` and component IDs; send only intended `updateDataModel` or `updateComponents` changes, not another `createSurface` or unrelated defaults. Static cards require `--flow-status FINISH` with a nonempty valid delta; prepare it before sending and preserve business data. Stream complete messages, not JSON tokens. Resource preflight checks only the delta. If current state is known, validate it with the delta; Schema validity does not prove business safety.
+`dws aicard preview --file a2ui.json` sends a self-preview in PROCESSING; `--dry-run` does not send. Finish a static preview with `dws chat message update-a2ui-card --flow-status FINISH`, the server-issued `data.bizId` (never request-side `bizCardId`), and `--a2ui-annotations` marking its main content component as `artifact`; otherwise the conversation summary becomes the server default. If it is absent, inspect `updateWarning` and the receipt; do not recreate automatically. `openTaskId` cannot be used with `query-send-status`.
 
-`dws aicard preview --file card.a2ui.json` sends a self-preview in PROCESSING; `--dry-run` does not send. For a completed static preview, finish it under the same profile with `dws chat message update-a2ui-card --biz-id <data.bizId> --content <message-strings> --flow-status FINISH`, using a nonempty state-preserving delta for the same Surface. Do not replay form defaults. Use server-issued `data.bizId`, never request-side `bizCardId`. If absent, inspect `updateWarning` and the receipt; do not recreate automatically. `openTaskId` cannot be used with `query-send-status`.
-
-After sending, use the available readback capability under the same profile and target to identify this exact card from returned instance/message identifiers. Generic card text and a nearby timestamp are not sufficient. Report request acceptance, same-target readback, client rendering and interaction separately. If readback is unavailable or inconclusive, mark it unverified; do not claim the user received or correctly rendered the card from API acceptance alone.""",
+After sending, identify this exact card from returned instance or message identifiers under the same Profile and target; generic card text and a nearby timestamp are not sufficient. Report request acceptance, readback, asynchronous summary, client rendering, and interaction separately; missing evidence stays unverified.""",
 }
 
 def read(path):

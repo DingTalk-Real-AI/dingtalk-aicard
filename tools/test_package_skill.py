@@ -54,6 +54,13 @@ class PackageSkillTest(unittest.TestCase):
             for required in ("LICENSE", "NOTICE", "SKILL.md", "scripts/setup_env.py", "scripts/aicard_lint.py"):
                 self.assertIn(f"{package.NAME}/{required}", names)
 
+    def test_archive_excludes_template_development_records(self):
+        package.build(self.target)
+        with zipfile.ZipFile(self.target) as archive:
+            names = set(archive.namelist())
+        for basename in ('https-media.json', 'provenance.json'):
+            self.assertFalse(any(name.endswith('/' + basename) for name in names))
+
     def test_archive_is_reproducible(self):
         with tempfile.TemporaryDirectory(dir=self.root) as directory:
             first, _ = self.build(directory, "first.zip")
@@ -68,6 +75,7 @@ class PackageSkillTest(unittest.TestCase):
         with zipfile.ZipFile(self.target) as archive:
             self.assertFalse(any("__pycache__" in name for name in archive.namelist()))
         self.assertEqual(stray.read_bytes(), b"fixture cache")
+
 
     def test_output_cannot_overwrite_source(self):
         source = self.skill / "SKILL.md"

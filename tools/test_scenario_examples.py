@@ -126,14 +126,16 @@ class ScenarioExamplesTest(unittest.TestCase):
 
     def test_agent_batches_preserve_interaction_and_icon_states(self):
         # These phases belong to the fixed examples, not to the protocol.
+        # The Agent thinks before its first tool call, so the first batch has no tool group.
         expected_groups = (
+            {},
             {'toolGroup_read': True},
             {'toolGroup_read': False, 'toolGroup_summary': True},
             {'toolGroup_read': False, 'toolGroup_summary': False},
         )
         for name in ('agent-run-progress', 'agent-run'):
             messages = self.examples[name]
-            self.assertEqual(4 if name == 'agent-run-progress' else 5, len(messages))
+            self.assertEqual(5 if name == 'agent-run-progress' else 6, len(messages))
             active = {}
             loading_images = set()
             for batch, message in enumerate(messages[2:]):
@@ -149,9 +151,12 @@ class ScenarioExamplesTest(unittest.TestCase):
                 self.assertNotIn('darkIcon', panel)
                 self.assertEqual('reasoning', panel['variant'])
                 self.assertTrue(active['executionTimeline']['children'])
-                self.assertEqual(batch < 2, panel.get('textEffect') == 'shimmer')
-                self.assertEqual(batch < 2, panel['title'].startswith('[AIGenerating]'))
-                self.assertEqual(list(expected_groups[batch]), active['executionTimeline']['children'])
+                self.assertEqual(batch < 3, panel.get('textEffect') == 'shimmer')
+                self.assertEqual(batch < 3, panel['title'].startswith('[AIGenerating]'))
+                self.assertEqual(batch == 0, panel['title'] == '[AIGenerating]Thinking...')
+                self.assertEqual(['thinking', *expected_groups[batch]], active['executionTimeline']['children'])
+                self.assertEqual('Text', active['thinking']['component'])
+                self.assertTrue(active['thinking']['text'].strip())
                 for group_id, running in expected_groups[batch].items():
                     with self.subTest(example=name, batch=batch, group=group_id):
                         group = active[group_id]
@@ -164,6 +169,9 @@ class ScenarioExamplesTest(unittest.TestCase):
                             loading_images.update((group['icon'], group['darkIcon']))
                         else:
                             self.assert_loading_images_cleared(group, loading_images)
+                            # Both examples mark a succeeded group with the named completion icon.
+                            self.assertEqual('Check_L_outlined', group['icon'])
+                            self.assertNotIn('darkIcon', group)
                 for component in active.values():
                     if component['component'] in ('Text', 'Icon', 'CollapsiblePanel'):
                         self.assertEqual('common_level2_base_color', component['colorToken'])
@@ -176,11 +184,22 @@ class ScenarioExamplesTest(unittest.TestCase):
                     self.assertNotIn('textEffect', component)
                     self.assertNotIn('[AIGenerating]', component['title'])
                     self.assertTrue(component['children'])
-                has_result = name == 'agent-run' and batch == 2
+                has_result = name == 'agent-run' and batch == 3
                 self.assertEqual(has_result, 'result' in active['root']['children'])
                 self.assertEqual(has_result, any(c['component'] == 'File' for c in active.values()))
-            self.assertEqual('Folder_L_outlined', active['toolGroup_read_icon']['name'])
-            self.assertEqual('CodeProgram_L_outlined', active['toolGroup_summary_icon']['name'])
+            # Each tool call is an expandable panel whose Markdown child shows fenced input/output.
+            for group_id, icon in (('toolGroup_read', 'Folder_L_outlined'),
+                                   ('toolGroup_summary', 'CodeProgram_L_outlined')):
+                with self.subTest(example=name, call=group_id):
+                    call = active[group_id + '_item']
+                    self.assertEqual([call['id']], active[group_id]['children'])
+                    self.assertEqual('CollapsiblePanel', call['component'])
+                    self.assertEqual(icon, call['icon'])
+                    self.assertEqual([group_id + '_detail'], call['children'])
+                    detail = active[group_id + '_detail']
+                    self.assertEqual('Markdown', detail['component'])
+                    self.assertTrue(detail['content'].startswith('```'))
+            self.assertIn('```csv\nregion,month,orders,revenue\n', active['toolGroup_read_detail']['content'])
             self.assertEqual(name == 'agent-run-progress',
                              any(c.get(field) in loading_images for c in active.values()
                                  for field in ('icon', 'darkIcon')))
@@ -189,6 +208,11 @@ class ScenarioExamplesTest(unittest.TestCase):
             if name == 'agent-run':
                 self.assertEqual(['answer', 'artifact'], active['result']['children'])
                 self.assertNotIn('result', active['executionTimeline']['children'])
+                self.assertIn('```csv\nregion,orders,revenue\n', active['toolGroup_summary_detail']['content'])
+                # The final summary must agree with the CSV the read step returned.
+                rows = active['toolGroup_read_detail']['content'].split('```csv\n')[1].split('\n```')[0].splitlines()[1:]
+                orders, revenue = (sum(int(r.split(',')[i]) for r in rows) for i in (2, 3))
+                self.assertIn(f'**{revenue:,}** from **{orders:,}** orders', active['answer']['content'])
 
     def test_bound_content_subpath_update(self):
         # Protocol regression coverage, independent of explanatory Markdown.

@@ -18,6 +18,41 @@ TEST_TMP.mkdir(parents=True, exist_ok=True)
 
 
 class LocalAuditTests(unittest.TestCase):
+    def test_preflight_rejects_hosts_without_a2ui_summary_or_forwarding_flags(self):
+        seams = [seam for seam in install.SEAMS if seam[2] == 'DWS Skill delivery']
+        self.assertEqual(2, len(seams))
+        declarations = [
+            'chatMessageSendA2UICardCmd.Flags().String("summary", "", "Summary")',
+            'chatMessageSendA2UICardCmd.Flags().Bool("support-forward", false, "Forwarding")',
+        ]
+        for missing in ('summary', 'support-forward', ''):
+            source = '\n'.join(line for line in declarations if not missing or missing not in line)
+            with self.subTest(missing=missing), patch.object(install, 'SEAMS', seams), \
+                    patch.object(install.os.path, 'isfile', return_value=True), \
+                    patch.object(install, 'read', side_effect=lambda path: (
+                        'module ' + install.MODULE if path.endswith('go.mod') else source)):
+                self.assertEqual(int(bool(missing)), len(install.preflight_target('/example/dws')))
+
+    def test_preflight_requires_template_deadline_and_client_configuration(self):
+        filename = 'internal/app/mcp_published_command.go'
+        seams = [seam for seam in install.SEAMS if seam[0] == filename]
+        declarations = [
+            'type mcpPublishedTransportFactory func()',
+            'func resolvePublishedMCPEndpoint() {}',
+            'func resolveMCPPublishedClientConfig() {}',
+            'func mcpPublishedCallerWithDeadline() {}',
+        ]
+        for missing in ('resolveMCPPublishedClientConfig', 'mcpPublishedCallerWithDeadline', ''):
+            source = '\n'.join(line for line in declarations if not missing or missing not in line)
+            with self.subTest(missing=missing), patch.object(install, 'SEAMS', seams), \
+                    patch.object(install.os.path, 'isfile', return_value=True), \
+                    patch.object(install, 'read', side_effect=lambda path: (
+                        'module ' + install.MODULE if path.endswith('go.mod') else source)):
+                problems = install.preflight_target('/example/dws')
+                self.assertEqual(int(bool(missing)), len(problems))
+                if missing:
+                    self.assertIn(missing, problems[0])
+
     def test_preflight_requires_card_id_normalizer(self):
         target = 'internal/shortcut/chatmsg/card_update.go'
         seams = [seam for seam in install.SEAMS if seam[0] == target]
@@ -283,11 +318,11 @@ class VerificationTests(unittest.TestCase):
             for name in src:
                 self.assertEqual('new', (target / name).read_text())
 
-    def test_root_discovery_failure_reaches_installer(self):
+    def test_aicard_integration_failure_reaches_installer(self):
         def run(command, **kwargs):
             failure = command[:3] == ['go', 'test', './internal/app/']
             if failure:
-                self.assertEqual(['-run', '^TestCrossPlatformCoverageAicardRootDiscovery$', '-count=1'], command[3:])
+                self.assertEqual(['-run', '^TestCrossPlatformCoverageAicard', '-count=1'], command[3:])
             return CompletedProcess(command, int(failure), 'root discovery regression' if failure else '', '')
         with patch.object(install.shutil, 'which', return_value='/go/bin/go'), \
                 patch.object(install.subprocess, 'run', side_effect=run):

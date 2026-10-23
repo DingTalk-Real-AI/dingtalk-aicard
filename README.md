@@ -13,7 +13,7 @@ An A2UI-based interface layer for business applications and AI agents. Compose i
 [![Agent: Skill](https://img.shields.io/badge/Agent-Skill-7256E8.svg)](skills/dingtalk-aicard/SKILL.md)
 [![CLI: DWS](https://img.shields.io/badge/CLI-DWS-1677FF.svg)](#dws-commands)
 
-[Gallery](#component-gallery) · [Capabilities](#components-and-interaction-capabilities) · [Quick start](#quick-start) · [Integration paths](#choose-your-integration) · [Reference](#developer-reference) · [Contributing](CONTRIBUTING.md)
+[Gallery](#component-gallery) · [Showcase](#showcase) · [Templates](#built-in-templates) · [Capabilities](#components-and-interaction-capabilities) · [Quick start](#quick-start) · [Integration paths](#choose-your-integration) · [Reference](#developer-reference) · [Contributing](CONTRIBUTING.md)
 
 </div>
 
@@ -21,9 +21,9 @@ Generate A2UI directly from your application, or use a Skill to assist an agent.
 
 ## Component gallery
 
-![DingTalk AI Card component showcase: layouts, data, media, inputs, and interactive details](assets/showcase/components-overview.png)
+![DingTalk AI Card component showcase: layouts, data, media, inputs, and interactive details](assets/showcase/components-overview.jpg)
 
-A showcase assembled from real DingTalk client screenshots. These examples illustrate the component system, not a fixed set of templates or business scenarios. [Watch component interactions](assets/showcase/component-interactions.mp4).
+A showcase assembled from real DingTalk client screenshots. These examples illustrate the component system; for complete business scenarios, see the [built-in templates](#built-in-templates). [Watch component interactions](assets/showcase/component-interactions.mp4).
 
 **47 components · 40 functions** for layouts, content, inputs, expressions, and interactions. [Explore the capabilities](#components-and-interaction-capabilities).
 
@@ -32,15 +32,15 @@ A showcase assembled from real DingTalk client screenshots. These examples illus
 ### Live execution and interactive details
 
 <p align="center">
-  <img src="assets/showcase/agent-loading.gif" width="46%" alt="Live execution with loading indicators and tool-stage updates">
+  <img src="assets/showcase/agent-loading-focus.gif" width="360" alt="Live execution with loading indicators and tool-stage updates">
   &nbsp;
-  <img src="assets/showcase/agent-expand-collapse.gif" width="46%" alt="Expanding and collapsing execution details alongside a report">
+  <img src="assets/showcase/agent-expand-collapse.gif" width="360" alt="Expanding and collapsing execution details alongside a report">
 </p>
 
 ### Human-in-the-loop workflow
 
 <p align="center">
-  <img src="assets/showcase/human-in-the-loop.gif" width="360" alt="A user submits a form before the workflow continues in a new card">
+  <img src="assets/showcase/human-in-the-loop-focus.gif" width="360" alt="A user submits a form before the workflow continues in a new card">
 </p>
 
 Collect user input, lock submitted controls, and let your application or agent continue the workflow.
@@ -54,9 +54,45 @@ Collect user input, lock submitted controls, and let your application or agent c
 - [Human-in-the-loop workflow](assets/showcase/human-in-the-loop.mp4)
 - [Component interactions](assets/showcase/component-interactions.mp4)
 
-The recordings use sample data and simulated tasks. GIFs are edited for pace and play independently; videos are cropped and muted.
+The recordings use sample data and simulated tasks. GIFs focus on the card, are edited for pace, and play independently; videos are cropped and muted.
 
 </details>
+
+## Built-in templates
+
+Start from one of nine complete business scenarios instead of a blank card: company information,
+morning briefing, today's tasks, approval summary, interview feedback, meeting invitation, meeting
+summary, task delegation, and weekly work report. Each scenario includes editable A2UI JSON and a
+rendered screenshot; approval summary also has a single-list JSON variant.
+
+<table>
+  <tr>
+    <td align="center" valign="top" width="50%">
+      <a href="assets/templates/README.md#expense-approval"><img src="assets/templates/images/thumbnails/expense-approval.png" width="440" alt="Approval summary template with approve and reject controls"></a><br>
+      <b>Approval summary</b><br>Approve or reject pending requests
+    </td>
+    <td align="center" valign="top" width="50%">
+      <a href="assets/templates/README.md#meeting-invitation"><img src="assets/templates/images/thumbnails/meeting-invitation.png" width="440" alt="Meeting invitation template with topic, participant, format, and agenda inputs"></a><br>
+      <b>Meeting invitation</b><br>Collect the topic, participants, and agenda
+    </td>
+  </tr>
+  <tr>
+    <td align="center" valign="top" width="50%">
+      <a href="assets/templates/README.md#weekly-work-report"><img src="assets/templates/images/thumbnails/weekly-work-report.png" width="440" alt="Weekly work report template with completed work, plans, and risks"></a><br>
+      <b>Weekly work report</b><br>Present results, plans, and risks
+    </td>
+    <td align="center" valign="top" width="50%">
+      <a href="assets/templates/README.md#task-delegation"><img src="assets/templates/images/thumbnails/task-delegation.png" width="440" alt="Task delegation template with selectable tasks grouped by category"></a><br>
+      <b>Task delegation</b><br>Choose tasks to hand to an assistant
+    </td>
+  </tr>
+</table>
+
+**[Browse all nine templates →](assets/templates/README.md)**
+
+Templates are starting points: replace the sample data and identifiers, connect actions to your
+service, and verify layout and interactions on your target clients. Screenshots show the initial
+state in a light-theme PC Web SDK preview, not a native client.
 
 ## Choose your integration
 
@@ -72,7 +108,7 @@ The two Skills share authoring guidance and protocol references, but use differe
 
 ### 1. Start with an A2UI file
 
-An A2UI file is an ordered array of messages describing a Surface, its data, and its components. Start with a complete [report](spec/examples/data-report.json) or [form](spec/examples/form-interaction.json), then replace demonstration data with your own.
+An A2UI file is an ordered array of messages describing a Surface, its data, and its components. Start from a [built-in template](assets/templates/README.md) that matches your scenario, or from a complete [report](spec/examples/data-report.json) or [form](spec/examples/form-interaction.json) example, then replace demonstration data with your own.
 
 Generate the file in application code, write it directly, or [ask an agent to author it](#generate-with-a-skill). Initialize a new card explicitly; send only intended changes when updating an existing card. See the [Surface lifecycle](spec/README.md#surface-initialization-and-updates).
 
@@ -114,7 +150,7 @@ This is an excerpt, not the complete report. Review any diagnostics. You now hav
 
 ### Optional: use native DWS AICard commands
 
-The native `dws aicard explain`, `lint`, and `preview` commands require a DWS build containing this repository's AICard module. A public release with these commands is not currently established by this guide; installing the public CLI alone is not sufficient assurance. Check `dws aicard --help` for all three commands.
+The public DWS 1.0.65 release includes the native `dws aicard explain`, `lint`, and `preview` commands. `dws aicard template` is not yet in a public release and requires a DWS build containing this repository's current AICard module. Each release follows the protocol bundled with it, so check `dws aicard --help` and the selected leaf's help.
 
 If they are unavailable, continue with the Python path above. Developers integrating the native module can follow [the source-build instructions](CONTRIBUTING.md#native-dws-build). Installing or copying the DWS Skill alone does not install the native commands.
 
@@ -157,19 +193,26 @@ The native `dws aicard` rows require the compatible build described above. The `
 | Inspect contracts | `dws aicard explain <name>` | Component, function, common-type, or Token definitions; supports batch lookup |
 | Validate JSON | `dws aicard lint --file <file>` | Schema validation and field-level diagnostics |
 | Check new-card structure | `lint --preflight new-card` | Initialization, root, static references, and cycle checks |
-| Check inline resources | `lint --preflight resources` | Resource-encoding checks without requiring a complete new card |
+| Check media resources | `lint --preflight resources` | Reject literal `data:` resource fields; flag Markdown markers for review |
 | Serialize for delivery | `lint --emit` | Validated messages as a string array in `data.a2uiMessages` |
 | Preview to yourself | `dws aicard preview --file <file>` | A real self-preview; `--dry-run` stays local |
+| Create a cloud template | `dws aicard template create --file <file>` | Save a complete A2UI file; return its new ID and assigned version |
+| Retrieve a template | `dws aicard template get --template-id <ID> --version <version> --out <new-file>` | Save retrieved content and return its digest; actual version remains unconfirmed |
+| Revise a template | `dws aicard template update --template-id <ID> --file <file>` | Append a version under the same ID; does not activate it or change sent cards |
 | Send to a target | `dws chat message send-a2ui-card` | Create and send to the selected person or conversation |
 | Update a card | `dws chat message update-a2ui-card` | Update the original card using its server-issued `bizId` |
 
-The `lint` rows abbreviate `dws aicard lint --file <file>` plus the listed option. See command help for fragment validation, package self-checks, compact queries, and delivery parameters. Lookup and validation are local; actual preview, sending, and updating require authentication and service access.
+The `lint` rows abbreviate `dws aicard lint --file <file>` plus the listed option. See command help for fragment validation, package self-checks, compact queries, and delivery parameters. Lookup and validation are local; template operations, actual preview, sending, and updating require authentication and service access.
+
+Template commands manage assets independently of card delivery. They accept complete UTF-8 A2UI files up to 768 KiB, preserve inline or explicit initialization, and use the current Profile's published MCP access. Configure the intended environment's service explicitly with `--mcp-id` or `DWS_AICARD_TEMPLATE_MCP_ID`; there is no cross-environment default, including for dry-run. `get` requires a new output path and refuses overwrites. The service may return latest content when a requested version is absent; compare `data.templateDigest` with the approved business binding and do not treat `requestedVersion` as confirmed. Business configuration owns scene bindings, version activation, and rollback. Template files may include a leading UTF-8 BOM; it is removed before validation, hashing, and transmission. Template writes have no automatic retry; template dry-runs neither call the service nor write files.
+
+Before using the generated DWS Skill for delivery, verify that the installed `chat message send-a2ui-card` help exposes `--summary` and `--support-forward`. Integrate the compatible chat changes before distributing the Skill; copying the AICard module does not add flags to an older chat implementation. The installer and native integration tests check this dependency.
 
 ### Validation and diagnostics
 
 Both tool paths check syntax and protocol constraints, including fields, required values, types, and enumerations. Diagnostics identify the failing field so a developer or agent can repair the original payload.
 
-New-card preflight additionally checks initialization and the final static component snapshot; resource preflight checks inline encoding. Check the selected preflight result as well as Schema validity. These checks do not evaluate bindings or functions, certify every streaming frame, load remote media, or prove client rendering and callbacks. Verify actual behavior in the target client.
+New-card preflight additionally checks initialization and the final static component snapshot; resource preflight rejects literal `data:` values in resource fields as workflow policy. Markdown and `fallbackMarkdown` containing `data:` text produce nonblocking review warnings; no Markdown/HTML parsing is performed. Review image destinations before delivery and prefer verified HTTPS assets. Check the selected preflight result as well as Schema validity. These checks do not evaluate bindings or functions, certify every streaming frame, load remote media, or prove client rendering and callbacks. Verify actual behavior in the target client.
 
 ## Components and interaction capabilities
 

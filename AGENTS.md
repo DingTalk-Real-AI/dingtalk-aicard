@@ -81,6 +81,13 @@ changes, review the DWS adaptation as well as the common text.
    The generator uses only the Python standard library. Design or pattern edits
    alone do not require installing lint dependencies.
 
+   After changing generated files tracked by `shared/.protocol-sync.json`, use
+   an existing validator interpreter to run `tools/sync_protocol.py
+   --refresh-generated`, then `tools/sync_protocol.py --check`. The refresh
+   verifies unchanged managed inputs and generator consistency before updating
+   digests. A default local rebuild protects generated files whose hashes changed;
+   do not use `--force` to bypass that protection or discard unrelated edits.
+
 3. Inspect the final diff for missing source or generated changes, including
    additions and deletions. If the generator changes, run
    `python3 tools/test_build_dws_skill.py`. Put test temporary directories

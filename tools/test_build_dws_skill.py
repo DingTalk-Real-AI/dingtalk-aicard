@@ -90,5 +90,6 @@ class DwsSkillBuildTests(unittest.TestCase):
             self.assertEqual("已有交付物", sentinel.read_text())
 
 
+
 if __name__ == "__main__":
     unittest.main()

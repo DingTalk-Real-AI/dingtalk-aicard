@@ -12,8 +12,8 @@ Uses jsonschema Draft 2020-12 without network access, sending, or DWS.
 The Go implementation must agree on shared/fixtures.
 Replace python3 below with the prepared interpreter; see setup_env.py.
 
-    python3 aicard_lint.py card.a2ui.json           # Human-readable
-    python3 aicard_lint.py card.a2ui.json --format json
+    python3 aicard_lint.py a2ui.json           # Human-readable
+    python3 aicard_lint.py a2ui.json --format json
     python3 aicard_lint.py --self-check             # Check package integrity
 
 Exit codes: 0 passed; 1 validation error; 2 input or environment error.
@@ -805,9 +805,10 @@ NOTES: dict[str, list[str]] = {
     "Row": ["align=stretch stretches row children on the cross axis; the target client implements the exact layout.",
             "Wrap or group many adjacent items for the target width; component count is not a protocol limit."],
     "Column": ["children arranges vertical content. An empty array is structurally valid; retain it only if useful."],
-    "Image": ["There is no protocol-level URL-scheme allowlist; non-HTTPS support depends on the host.",
+    "Image": ["There is no protocol-level URL-scheme allowlist; non-HTTPS support depends on the host. Resource preflight rejects literal data URIs as workflow policy.",
               "smallFeature is at most 96×96; with text, keep title within two lines and summary within three to avoid distortion."],
     "Markdown": ["The current protocol describes <a atId> as plain-text fallback, without a guaranteed clickable mention. Put only the display name inside the tag.",
+                 "Prefer verified HTTPS image URLs. Resource preflight flags data: text for manual review; it does not parse Markdown or establish client support.",
                  "Split unrelated topics into Column or Card groups instead of one Markdown block."],
     "Button": ["Select variant by action priority. The validator does not impose a primary-button count.",
                "Put business IDs such as bizId in action.event.context so callbacks can be attributed.",
@@ -1304,8 +1305,72 @@ def explain_many(protocol, names, compact=False):
     return result
 
 
+def _check_static_ownership(nodes, edges, surface_id):
+    """Check source ownership in ordered DFS, then template deletion hazards with bounded graph passes."""
+    diagnostics, owners, visited, order, templates = [], {}, {'root'}, ['root'], []
+    stack = [('root', iter(edges['root']))]
+    while stack:
+        cid, iterator = stack[-1]
+        edge = next(iterator, None)
+        if edge is None:
+            stack.pop()
+            continue
+        target, pointer, template = edge
+        if target not in nodes:
+            continue
+        if template:
+            templates.append((target, pointer))
+        if target in owners:
+            parent, first_pointer = owners[target]
+            code = 'duplicate_child' if parent == cid else 'multiple_parents'
+            diagnostics.append(Diagnostic('reference.' + code, 'error', pointer,
+                                           f'Surface {surface_id} child {target} is referenced by '
+                                           f'{parent} ({first_pointer}) and {cid} ({pointer})',
+                                           'Keep one reference per component ID; use distinct IDs for separate placements.'))
+        else:
+            owners[target] = (cid, pointer)
+        if target not in visited:
+            visited.add(target)
+            order.append(target)
+            stack.append((target, iter(edges[target])))
+
+    def static_reachable(seeds):
+        found = {}
+        pending = list(reversed(seeds))
+        while pending:
+            cid, origin = pending.pop()
+            if cid in found:
+                continue
+            found[cid] = origin
+            pending.extend((target, origin) for target, _, template in reversed(edges[cid])
+                           if not template and target in nodes and target not in found)
+        return found
+
+    # Nest expands every snapshot template, including unreachable containers.
+    for cid in sorted(set(nodes) - visited):
+        templates.extend((target, pointer) for target, pointer, template in edges[cid]
+                         if template and target in nodes)
+
+    static = static_reachable([('root', nodes['root'][1] + '/id')])
+    sources = static_reachable(templates)
+    conflicts = []
+    if 'root' in sources:
+        conflicts.append(('root', nodes['root'][1] + '/id'))
+    for cid in order:
+        if cid not in static or cid in sources:
+            continue
+        conflicts.extend((target, pointer) for target, pointer, template in edges[cid]
+                         if not template and target in sources)
+    for target, pointer in conflicts:
+        diagnostics.append(Diagnostic('reference.template_source_referenced', 'error', pointer,
+                                       f'Surface {surface_id} statically references template source {target} '
+                                       f'({pointer}); template reference {sources[target]} removes this source subtree',
+                                       'Use separate component IDs for static content and every template source subtree.'))
+    return diagnostics
+
+
 def _component_reference_diagnostics(nodes, protocol, surface_pointer, surface_id):
-    """Check reachable references in the final snapshot; template edges check existence only."""
+    """Check final-snapshot reference closure, ownership, and template source deletion."""
     if 'root' not in nodes:
         return [Diagnostic('reference.missing_root', 'error', surface_pointer,
                             f'Surface {surface_id} is missing the root component in its final snapshot')]
@@ -1345,7 +1410,9 @@ def _component_reference_diagnostics(nodes, protocol, surface_pointer, surface_i
             elif target not in reachable:
                 pending.append(target)
 
-    # Iterative three-color DFS avoids treating shared DAG children or deep chains as cycles.
+    diagnostics.extend(_check_static_ownership(nodes, edges, surface_id))
+
+    # Ownership and cycles are independent; use an iterative DFS for deep graphs.
     colors = {}
     for start in sorted(reachable):
         if colors.get(start):
@@ -1374,11 +1441,16 @@ def _component_reference_diagnostics(nodes, protocol, surface_pointer, surface_i
     return diagnostics
 
 
+def _resource_has_inline_data(value):
+    """Skip leading C0 controls, spaces, and Unicode whitespace before the scheme, as DWS does."""
+    index = 0
+    while index < len(value) and (value[index] <= ' ' or value[index].isspace()):
+        index += 1
+    return value[index:].lower().startswith('data:')
+
+
 def preflight(messages, protocol, mode='new-card'):
     """Offline preflight after Schema validation; never sends, rewrites, or evaluates expressions."""
-    import base64
-    import binascii
-    from urllib.parse import unquote_to_bytes
     diagnostics = []
     def error(code, pointer, message):
         diagnostics.append(Diagnostic(code, 'error', pointer, message))
@@ -1434,30 +1506,29 @@ def preflight(messages, protocol, mode='new-card'):
             else:
                 diagnostics.extend(_component_reference_diagnostics(state['nodes'], protocol, state['pointer'], sid))
     # Scan component resource fields only; ordinary text containing data: is not a resource.
-    resource_keys = {'url', 'darkUrl', 'imageUrl', 'posterUrl', 'coverUrl', 'images'}
+    resource_keys = {'url', 'darkUrl', 'imageUrl', 'posterUrl', 'coverUrl', 'images', 'icon', 'darkIcon'}
     def resource(node, pointer, field=''):
         if isinstance(node, dict):
+            markdown_fields = ['content'] if node.get('component') == 'Markdown' else []
+            if isinstance(node.get('component'), str):
+                markdown_fields.append('fallbackMarkdown')
+            for key in markdown_fields:
+                if isinstance(node.get(key), str) and 'data:' in node[key].lower():
+                    diagnostics.append(Diagnostic('resource.markdown_data_unverified', 'warning', pointer + '/' + key,
+                        'Markdown contains data: text; review image destinations before delivery. This check does not parse Markdown or verify resource use'))
             for key, value in node.items():
+                # Table rows and chart data/config are business values, not component definitions.
+                if key == 'data' and node.get('component') in ('Table', 'Chart'):
+                    continue
                 if key in ('metadata', 'action', 'checks') or key.startswith('on'):
                     continue
                 resource(value, pointer + '/' + key.replace('~', '~0').replace('/', '~1'), key)
         elif isinstance(node, list):
             for index, value in enumerate(node):
                 resource(value, pointer + '/' + str(index), field)
-        elif isinstance(node, str) and field in resource_keys and node.lower().startswith('data:'):
-            header, sep, content = node.partition(',')
-            if header.lower().startswith('data:image/') and ';base64' in header.lower():
-                diagnostics.append(Diagnostic('resource.base64_image_unverified', 'warning', pointer, 'Base64 image compatibility and operation size are unverified; prefer a verified HTTPS image URL'))
-            if not sep or re.search(r'%(?![0-9a-fA-F]{2})', content):
-                error('resource.invalid_data_uri', pointer, 'The data URI lacks a separator or contains invalid escaping')
-                return
-            if header.lower().endswith(';base64'):
-                try:
-                    decoded = base64.b64decode(unquote_to_bytes(content), validate=True)
-                    if not decoded:
-                        raise ValueError('empty')
-                except (binascii.Error, ValueError):
-                    error('resource.invalid_base64', pointer, 'Resource Base64 is empty or damaged; re-encode the original file instead of copying tool logs')
+        elif isinstance(node, str) and field in resource_keys and _resource_has_inline_data(node):
+            error('resource.inline_data_unsupported', pointer,
+                  'Inline data URLs are disallowed by resource preflight; use a verified, host-accessible asset URL')
     for i, message in enumerate(messages):
         for operation in ('createSurface', 'updateComponents'):
             for j, component in enumerate(message.get(operation, {}).get('components', [])):

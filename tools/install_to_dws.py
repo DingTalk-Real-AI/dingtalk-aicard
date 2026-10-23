@@ -39,7 +39,9 @@ DEFAULT_DWS = os.path.normpath(os.path.join(ROOT, "..", "dingtalk-workspace-cli"
 MODULE = "github.com/DingTalk-Real-AI/dingtalk-workspace-cli"
 GO_DEPENDENCIES = ["github.com/santhosh-tekuri/jsonschema/v6@v6.0.2", "github.com/dlclark/regexp2@v1.11.5"]
 SKILL_REL = os.path.join("skills", "multi", "dingtalk-aicard")
-SKILL_MAX_BYTES = 10_342  # 10.1 KiB, rounded down to whole bytes.
+# Entry-point growth guard. Complete authoring, delivery, and template rules take
+# priority over compression; remove duplication before raising this budget.
+SKILL_MAX_BYTES = 12 * 1024
 JUNK = {"__pycache__", ".pyc"}
 LOCAL_AUDIT = "internal/cli/schema_parameter_mapping_completeness_test.go"
 LOCAL_AUDIT_ANCHOR = "func TestDeliveryCatalogLocalInterfacesAreExactAndReviewed(t *testing.T) {\n\twantReasons := map[string]string{\n"
@@ -84,6 +86,10 @@ def local_audit_content(dws: str, *, remove: bool = False) -> tuple[str, bool]:
 # Required target integration points: file, expected pattern (None for the token-aware root check), and dependent feature. A missing point means upstream changed the integration,
 # so inspect the integration before installation; forcing a copy cannot fix it.
 SEAMS = [
+    ("internal/helpers/chat.go", r'chatMessageSendA2UICardCmd\.Flags\(\)\.String\("summary",',
+     "DWS Skill delivery", "Readable A2UI summary flag in the chat delivery command"),
+    ("internal/helpers/chat.go", r'chatMessageSendA2UICardCmd\.Flags\(\)\.Bool\("support-forward",',
+     "DWS Skill delivery", "Explicit forwarding policy in the chat delivery command"),
     ("internal/shortcut/chatmsg/card_update.go", r"^func NormalizeCardBizID\(\w+ string\) \(string, error\)",
      "aicard_run.go", "Server-issued card update ID normalization"),
     ("internal/app/root.go", None,
@@ -92,6 +98,8 @@ SEAMS = [
      "aicard_test.go", "Command test execution with runtime contract validation"),
     ("internal/helpers/interfaces.go", r"^func RegisterPublicNamed\(name string, factory Factory\)",
      "register_aicard.go", "Handwritten RegisterPublicNamed registration path"),
+    ("internal/helpers/fortest.go", r"^func InitDepsForTest\(",
+     "aicard_template_boundary_test.go", "Scoped dependencies in root-command integration tests"),
     ("internal/helpers/register_products.go", r"^type wukongHandler struct",
      "register_aicard.go", "wukongHandler{name, buildFn} adapter"),
     ("internal/helpers/helpers.go", r"^func newGroupCommand\(command \*cobra\.Command\) \*cobra\.Command",
@@ -126,6 +134,20 @@ SEAMS = [
      "aicard.go", "Embedded Skill documentation link constructor"),
     ("internal/corecmd/runtimeannotate/annotate.go", r"^func AnnotateRuntimePositionals\(",
      "aicard.go", "explain name positional argument"),
+    ("internal/app/tool_caller_adapter.go", r"^type toolCallerAdapter struct",
+     "aicard_template_caller.go", "Authenticated host caller adapter"),
+    ("internal/app/usage_recording.go", r"^type recordingToolCaller struct",
+     "aicard_template_caller.go", "Capability-preserving usage wrapper"),
+    ("internal/app/mcp_published_command.go", r"^type mcpPublishedTransportFactory func\(",
+     "aicard_template_caller.go", "Authenticated published-MCP transport factory"),
+    ("internal/app/mcp_published_command.go", r"^func resolvePublishedMCPEndpoint\(",
+     "aicard_template_caller.go", "Identity-scoped published service discovery"),
+    ("internal/app/mcp_published_command.go", r"^func resolveMCPPublishedClientConfig\(",
+     "aicard_template_caller.go", "Invocation-scoped published client configuration"),
+    ("internal/app/mcp_published_command.go", r"^func mcpPublishedCallerWithDeadline\(",
+     "aicard_template_caller.go", "Operation-scoped service-discovery HTTP deadlines"),
+    ("internal/publishedmcp/client.go", r"^type ValidatedInvocationResult struct",
+     "aicard_template_run.go", "Fresh input validation and zero-retry published invocation"),
     ("skills/embed.go", r"go:embed all:mono all:multi",
      "skills/multi/dingtalk-aicard/", "Skills embedded by directory wildcard; no registration required"),
     ("test/unit/mono_multi_skill_content_test.go", r"G2: %s: metadata\.category",
@@ -385,14 +407,14 @@ def verify(dws: str, go_files: list[str]) -> list[str]:
         print("  gofmt             not installed locally; skipped")
     if not go:
         print("  go                Go is not installed locally; run build verification on a machine with Go:")
-        print(f"                    cd {dws} && go build ./... && go vet ./internal/helpers/ && go test ./internal/card/a2ui/ -count=1 && go test ./internal/helpers/ -run Aicard -count=1 && go test ./internal/app/ -run '^TestCrossPlatformCoverageAicardRootDiscovery$' -count=1")
+        print(f"                    cd {dws} && go build ./... && go vet ./internal/helpers/ ./internal/app/ && go test ./internal/card/a2ui/ -count=1 && go test ./internal/helpers/ -run Aicard -count=1 && go test ./internal/app/ -run '^TestCrossPlatformCoverageAicard' -count=1")
         return ["Go is unavailable, so build verification cannot complete; specify --skip-verify explicitly to copy only"]
     steps = [
         ("go build ./...", ["go", "build", "./..."]),
-        ("go vet ./internal/helpers/", ["go", "vet", "./internal/helpers/"]),
+        ("go vet ./internal/helpers/ ./internal/app/", ["go", "vet", "./internal/helpers/", "./internal/app/"]),
         ("go test ./internal/card/a2ui/", ["go", "test", "./internal/card/a2ui/", "-count=1"]),
         ("go test ./internal/helpers/ -run Aicard", ["go", "test", "./internal/helpers/", "-run", "Aicard", "-count=1"]),
-        ("go test ./internal/app/ (AICard root discovery)", ["go", "test", "./internal/app/", "-run", "^TestCrossPlatformCoverageAicardRootDiscovery$", "-count=1"]),
+        ("go test ./internal/app/ (AICard discovery and template integration)", ["go", "test", "./internal/app/", "-run", "^TestCrossPlatformCoverageAicard", "-count=1"]),
     ]
     for label, cmd in steps:
         try:

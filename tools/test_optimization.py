@@ -39,7 +39,7 @@ class OptimizationTests(unittest.TestCase):
         self.assertEqual([], m.lint([self.create], self.p)[0])
         self.assertFalse(self.codes([self.create]))
         self.create['createSurface']['components'] = [{'id': 'root', 'component': 'Image', 'url': 'data:image/png;base64,error!'}]
-        self.assertIn('resource.invalid_base64', self.codes([self.create]))
+        self.assertIn('resource.inline_data_unsupported', self.codes([self.create]))
 
     def test_deletion_is_not_initialization(self):
         del self.data['updateDataModel']['value']
@@ -62,18 +62,18 @@ class OptimizationTests(unittest.TestCase):
     def test_delta_resource_check_does_not_require_creation(self):
         self.assertFalse(self.codes([self.components], 'resources'))
 
-    def test_resource_validation_does_not_reject_unknown_schemes(self):
+    def test_resource_policy_rejects_data_without_rejecting_other_schemes(self):
         c = self.components['updateComponents']['components'][0]
         c.update(component='Image')
         c.pop('text')
-        for url in ['data:image/jpeg;base64,/Users/test: error\n/9j/', 'data:image/png;base64,', 'data:image/png;base64,%GG']:
+        for url in ['data:image/jpeg;base64,/Users/test: error\n/9j/', 'data:image/png;base64,', 'data:image/png;base64,%GG', 'data:image/svg+xml,%3Csvg/%3E']:
             c['url'] = url
             self.assertFalse(m.preflight(self.card, self.p)['valid'])
-        for url in ['data:image/svg+xml,%3Csvg/%3E', 'dingtalk://some-media', 'https://example.com/preview.png']:
+        for url in ['dingtalk://some-media', 'https://example.com/preview.png']:
             c['url'] = url
             self.assertFalse(self.codes(self.card))
 
-    def test_valid_base64_images_warn_without_rejecting_resource_fields(self):
+    def test_inline_data_is_rejected_in_resource_fields(self):
         for field in ['url', 'darkUrl', 'imageUrl', 'posterUrl', 'coverUrl', 'images']:
             with self.subTest(field=field):
                 c = self.components['updateComponents']['components'][0]
@@ -82,13 +82,64 @@ class OptimizationTests(unittest.TestCase):
                 c.update(id='root', component='Image', **{field: [value] if field == 'images' else value})
                 for card, mode in ((self.card, 'new-card'), ([self.components], 'resources')):
                     result = m.preflight(card, self.p, mode)
-                    self.assertTrue(result['valid'])
+                    self.assertFalse(result['valid'])
                     self.assertFalse(result['renderingVerified'])
                     self.assertEqual(1, len(result['diagnostics']))
-                    warning = result['diagnostics'][0]
-                    self.assertEqual('resource.base64_image_unverified', warning['code'])
-                    self.assertEqual('warning', warning['severity'])
-                    self.assertTrue(warning['pointer'].endswith('/' + field + ('/0' if field == 'images' else '')))
+                    error = result['diagnostics'][0]
+                    self.assertEqual('resource.inline_data_unsupported', error['code'])
+                    self.assertEqual('error', error['severity'])
+                    self.assertTrue(error['pointer'].endswith('/' + field + ('/0' if field == 'images' else '')))
+
+    def test_shared_resource_policy_cases_preserve_schema_validity(self):
+        path = ROOT / 'dws-aicard/internal/card/a2ui/testdata/resource-policy.json'
+        for case in json.loads(path.read_text()):
+            with self.subTest(name=case['name']):
+                self.components['updateComponents']['components'] = [case['component']]
+                self.assertEqual([], m.lint(self.card, self.p)[0])
+                for card, mode in ((self.card, 'new-card'), ([self.components], 'resources')):
+                    result = m.preflight(card, self.p, mode)
+                    self.assertEqual(case['valid'], result['valid'])
+                    if case.get('warningPointerSuffix'):
+                        self.assertEqual(1, len(result['diagnostics']))
+                        warning = result['diagnostics'][0]
+                        self.assertEqual('resource.markdown_data_unverified', warning['code'])
+                        self.assertEqual('warning', warning['severity'])
+                        self.assertTrue(warning['pointer'].endswith(case['warningPointerSuffix']))
+                    elif case['valid']:
+                        self.assertEqual([], result['diagnostics'])
+                    else:
+                        self.assertEqual(1, len(result['diagnostics']))
+                        error = result['diagnostics'][0]
+                        self.assertEqual('resource.inline_data_unsupported', error['code'])
+                        self.assertEqual('error', error['severity'])
+                        self.assertTrue(error['pointer'].endswith(case['pointerSuffix']))
+
+    def test_markdown_review_does_not_block_adversarial_content(self):
+        # Exercise the full preflight on large syntax-like text without parsing it.
+        import time
+        shapes = {
+            'image openers': '![' * 30_000,
+            'unclosed tags': '<img a' * 10_000,
+            'reference openers': '![a][' * 12_000,
+            'backtick runs': '` ``' * 15_000,
+            'reference definitions': '[a]: ' * 12_000,
+            'shared bracket before a long destination': '![' * 15_000 + '](' + 'a' * 30_000,
+            'shared bracket with an inline reference': '[x]: data:a\n\n' + '![' * 30_000 + ']',
+            'tags sharing one close': '<img ' * 12_000 + '>',
+            'attributes sharing one close': '<img src=a ' * 6_000 + '>',
+            'overlapping destinations': '![a](x' * 10_000,
+            'overlapping entity destinations': '![a](&' * 10_000,
+            'backticks between blank lines': '`\n\n' * 20_000,
+            'nested labels with an unused reference': '![' * 30_000 + ']' * 30_000 + '\n\n[x]: data:image/png;base64,AA==',
+        }
+        for name, content in shapes.items():
+            with self.subTest(shape=name):
+                started = time.perf_counter()
+                self.components['updateComponents']['components'] = [{'id': 'root', 'component': 'Markdown', 'content': content}]
+                result = m.preflight(self.card, self.p)
+                self.assertTrue(result['valid'])
+                self.assertFalse(any(d['severity'] == 'error' for d in result['diagnostics']))
+                self.assertLess(time.perf_counter() - started, 1.0)
 
     def test_text_is_not_a_resource(self):
         self.components['updateComponents']['components'][0]['text'] = 'data:image/png;base64,invalid!'

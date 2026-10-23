@@ -1,6 +1,6 @@
 ---
 status: authoritative
-updated: 2026-09-21
+updated: 2026-10-21
 scope: Files, on-demand loading and message examples of DingTalk AICard Protocol V0.8; prepared for release, not yet published
 ---
 
@@ -27,6 +27,44 @@ This is the **V0.8 specification prepared for publication** of DingTalk AI Card,
 The public Schemas and requirements in this document jointly define the contract. The examples are explanatory. Lint implements statically checkable requirements using these Schemas and version-matched supplementary rules; its implementation must not introduce undocumented requirements. Passing lint does not establish successful delivery, rendering, or interaction for a particular payload.
 
 This repository layout does not change fields or runtime identifiers. Publish incompatible contract changes under an explicit new specification release with migration and identifier changes documented. Retain prior releases; additions must state client support rather than imply availability on older clients.
+
+## Component ownership and template source safety
+
+Within each Surface's final snapshot, the tree reachable from `root` must give
+each non-root component ID one incoming reference; `root` has none.
+Different parents must not share an ID, and a parent must not repeat an ID in its child list or across child slots
+(such as `Stack.child` and `Stack.overlays[].child`). Define distinct IDs for
+separate placements. Later messages may replace a component; they do not make
+multiple placements in the final snapshot safe.
+
+Template source IDs are global within a Surface. Two reachable template
+containers must not reuse a source root or share any source descendant. The
+current Nest expander creates clone IDs from the source ID plus
+`__a2ui_item_` and the item index, without a container-specific namespace. It
+removes template sources and their static descendants from the component map.
+Static content must therefore not reference those sources or descendants.
+This deletion constraint also applies to templates in unreachable containers:
+Nest scans the whole snapshot for expansion. Unrelated unreachable definitions
+do not by themselves violate ownership.
+
+Enforce these structural requirements even when arrays are currently empty;
+a later data update must not introduce ID collisions or remove live content.
+Template links remain distinct from static edges for cycle detection. These
+checks do not evaluate bindings, dynamic expansion, intermediate stream frames,
+or rendered behavior.
+
+These rules follow the renderer's source-level behavior:
+
+- Template expansion names clones, expands the whole snapshot, and removes
+  sources globally.
+- Ordered DFS assigns parents and rejects multiple parents.
+- Per-placement construction rejects node ID collisions for repeated
+  placements, including repetitions under one parent.
+
+Offline diagnostics follow root child-order DFS, point to the additional
+reference and retain both reference locations. Source ID collisions can cause
+whole-card fallback; removed static sources can cause local missing-component
+placeholders. This source-level evidence is not a client/version support matrix.
 
 ## Files and loading order
 

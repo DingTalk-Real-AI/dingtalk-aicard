@@ -4,6 +4,7 @@
 
 """Check distribution links and standalone installation without network, Profile, or sending."""
 import json
+import html
 import os
 from pathlib import Path
 import re
@@ -13,12 +14,97 @@ import subprocess
 import sys
 import tempfile
 import unittest
+import unicodedata
 from urllib.parse import unquote, urlsplit
+
+from install_to_dws import SKILL_MAX_BYTES
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def markdown_anchors(text):
+    """Collect rendered heading slugs and explicit HTML anchors, excluding fences."""
+    anchors, heading_ids = set(), set()
+    fence, previous, frontmatter = None, '', text.startswith('---\n')
+    for number, line in enumerate(text.splitlines()):
+        if frontmatter:
+            if number and line.strip() == '---':
+                frontmatter = False
+            continue
+        marker = re.match(r'^ {0,3}(`{3,}|~{3,})(.*)$', line)
+        if fence:
+            if marker and marker[1][0] == fence[0] and len(marker[1]) >= len(fence) and not marker[2].strip():
+                fence = None
+            previous = ''
+            continue
+        if marker:
+            fence, previous = marker[1], ''
+            continue
+        anchors.update(re.findall(r'<a\b[^>]*\b(?:id|name)=[\"\']([^\"\']+)[\"\']', line, re.I))
+        heading = re.match(r'^ {0,3}#{1,6}(?:[ \t]+(.*)|$)', line)
+        title = None
+        if heading:
+            title = re.sub(r'[ \t]+#+[ \t]*$', '', heading[1] or '').strip()
+        elif previous and re.fullmatch(r' {0,3}(?:=+|-+)[ \t]*', line):
+            title = previous
+        if title is not None:
+            title = re.sub(r'!?\[([^]]*)\]\([^)]*\)', r'\1', title)
+            title = html.unescape(re.sub(r'<[^>]*>', '', title)).lower()
+            base = ''.join(char for char in title if char in ' _-'
+                           or unicodedata.category(char)[0] in 'LNM').replace(' ', '-')
+            slug, suffix = base, 0
+            while slug in heading_ids:
+                suffix += 1
+                slug = f'{base}-{suffix}'
+            heading_ids.add(slug)
+            anchors.add(slug)
+            previous = ''
+        else:
+            previous = line.strip() if line and not line.startswith(('    ', '\t')) else ''
+    return anchors
+
+
 class PublicPackageTests(unittest.TestCase):
+    def assert_local_link(self, doc, target, edition=None):
+        parsed = urlsplit(target)
+        if parsed.scheme:
+            return
+        path = (doc.parent / unquote(parsed.path)).resolve() if parsed.path else doc.resolve()
+        if edition is not None:
+            self.assertTrue(path.is_relative_to(edition.resolve()), str(path))
+        self.assertTrue(path.exists(), str(path))
+        fragment = unquote(parsed.fragment)
+        if path.suffix == '.md' and fragment:
+            self.assertIn(fragment, markdown_anchors(path.read_text(encoding='utf-8')),
+                          f'{doc}: {target}')
+        elif path.suffix == '.json' and fragment.startswith('/'):
+            node = json.loads(path.read_text())
+            for part in fragment.lstrip('/').split('/'):
+                key = part.replace('~1', '/').replace('~0', '~')
+                node = node[int(key)] if isinstance(node, list) else node[key]
+
+    def test_heading_links_handle_formatting_duplicates_and_fenced_examples(self):
+        # The localized heading is an intentional Unicode anchor input.
+        anchors = markdown_anchors('''# **Short** `notifications`
+# Short notifications
+# Short notifications-1
+```md
+# Hidden heading
+```
+## [Input values](guide.md) &amp; results
+Heading below
+-------------
+<a id="legacy-anchor"></a>
+## 中文标题
+''')
+        self.assertEqual({'short-notifications', 'short-notifications-1', 'short-notifications-1-1',
+                          'input-values--results', 'heading-below', 'legacy-anchor', '中文标题'}, anchors)
+
+    def test_removed_sections_fail_local_link_checks(self):
+        doc = ROOT / 'skills/dingtalk-aicard/SKILL.md'
+        with self.assertRaises(AssertionError):
+            self.assert_local_link(doc, '#missing-section-for-link-regression')
+
     def test_execution_dependencies_match_each_distribution(self):
         standalone = ROOT / 'skills/dingtalk-aicard'
         native = ROOT / 'dws-aicard/skills/multi/dingtalk-aicard'
@@ -44,7 +130,7 @@ class PublicPackageTests(unittest.TestCase):
         scratch = ROOT / '.analysis-artifacts/document-command-tests'
         scratch.mkdir(parents=True, exist_ok=True)
         with tempfile.TemporaryDirectory(dir=scratch) as directory:
-            card = Path(directory) / 'card.a2ui.json'
+            card = Path(directory) / 'a2ui.json'
             card.write_text(json.dumps(messages))
             script = skill / 'scripts/aicard_lint.py'
             help_result = subprocess.run([sys.executable, str(script), '--help'],
@@ -60,7 +146,7 @@ class PublicPackageTests(unittest.TestCase):
                         argv = shlex.split(line)
                         argv = [sys.executable if value == '<pythonExecutable>' else
                                 str(script) if value.endswith('/scripts/aicard_lint.py') else
-                                str(card) if value == 'card.a2ui.json' else value for value in argv]
+                                str(card) if value == 'a2ui.json' else value for value in argv]
                         result = subprocess.run(argv, capture_output=True, text=True, timeout=30)
                         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
                         json.loads(result.stdout)
@@ -90,17 +176,8 @@ class PublicPackageTests(unittest.TestCase):
         documents += list((ROOT / 'skills/dingtalk-aicard').rglob('*.md'))
         for doc in documents:
             for target in re.findall(r'\]\(([^\s)]+)\)', doc.read_text()):
-                parsed = urlsplit(target)
-                if parsed.scheme or not parsed.path:
-                    continue
-                path = (doc.parent / unquote(parsed.path)).resolve()
                 with self.subTest(document=str(doc.relative_to(ROOT)), target=target):
-                    self.assertTrue(path.exists(), str(path))
-                    if path.suffix == '.json' and parsed.fragment.startswith('/'):
-                        node = json.loads(path.read_text())
-                        for part in parsed.fragment.lstrip('/').split('/'):
-                            key = unquote(part).replace('~1', '/').replace('~0', '~')
-                            node = node[int(key)] if isinstance(node, list) else node[key]
+                    self.assert_local_link(doc, target)
 
     def test_skill_works_outside_repository_with_bundled_protocol(self):
         env = dict(os.environ, PYTHONDONTWRITEBYTECODE='1')
@@ -126,7 +203,7 @@ class PublicPackageTests(unittest.TestCase):
             dws = ROOT / 'dws-aicard/skills/multi/dingtalk-aicard'
             for edition in (destination, dws):
                 entry = edition / 'SKILL.md'
-                self.assertLessEqual(entry.stat().st_size, 10_342)
+                self.assertLessEqual(entry.stat().st_size, SKILL_MAX_BYTES)
                 self.assertIn('## Delivery boundary', entry.read_text())
                 if edition == dws:
                     self.assertIn('chat message update-a2ui-card', entry.read_text())
@@ -134,13 +211,8 @@ class PublicPackageTests(unittest.TestCase):
                 self.assertFalse(any('evals' in path.parts for path in edition.rglob('*')))
                 for doc in edition.rglob('*.md'):
                     for target in re.findall(r'\]\(([^\s)]+)\)', doc.read_text()):
-                        parsed = urlsplit(target)
-                        if parsed.scheme or not parsed.path:
-                            continue
-                        resolved = (doc.parent / unquote(parsed.path)).resolve()
                         with self.subTest(edition=str(edition), document=str(doc), target=target):
-                            self.assertTrue(resolved.is_relative_to(edition.resolve()))
-                            self.assertTrue(resolved.exists(), str(resolved))
+                            self.assert_local_link(doc, target, edition)
             for file in ('LICENSE', 'NOTICE'):
                 self.assertEqual((destination / file).read_bytes(), (dws / file).read_bytes())
 

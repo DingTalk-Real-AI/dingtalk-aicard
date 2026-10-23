@@ -139,11 +139,12 @@ func runAicardExplain(cmd *cobra.Command, args []string) error {
 func runAicardPreview(cmd *cobra.Command, _ []string) error {
 	file, _ := cmd.Flags().GetString("file")
 	summary, _ := cmd.Flags().GetString("summary")
+	supportForward, _ := cmd.Flags().GetBool("support-forward")
 	if strings.TrimSpace(file) == "" {
 		return aicardFailure(cmd, "validation", "--file is required", nil)
 	}
 	if strings.TrimSpace(summary) == "" {
-		return aicardFailure(cmd, "validation", "--summary must not be empty", nil)
+		return aicardFailure(cmd, "validation", "--summary must not be blank", nil)
 	}
 	p, err := aicardLoadProtocol()
 	if err != nil {
@@ -172,7 +173,8 @@ func runAicardPreview(cmd *cobra.Command, _ []string) error {
 	if commandDryRun(cmd) {
 		return output.StoreResult(cmd.Context(), output.Success(map[string]any{
 			"executed": false, "requestAccepted": false, "deliveryVerified": false, "renderingVerified": false,
-			"flowStatus": "PROCESSING", "summary": summary, "a2uiMessages": report.A2UIMessages, "preflight": preflight,
+			"flowStatus": "PROCESSING", "summary": summary, "supportForward": supportForward,
+			"a2uiMessages": report.A2UIMessages, "preflight": preflight,
 		}, output.WithDryRun()))
 	}
 	userID, err := getCurrentUserID(cmd.Context())
@@ -186,7 +188,7 @@ func runAicardPreview(cmd *cobra.Command, _ []string) error {
 	requestID, bizCardID := uuid.NewString(), uuid.NewString()
 	args := map[string]any{
 		"requestId": requestID, "bizCardId": bizCardID, "protocolVersion": "1.0",
-		"supportForward": false, "flowStatus": defaultA2UIFlowStatus,
+		"supportForward": supportForward, "flowStatus": defaultA2UIFlowStatus,
 		"a2uiMessages": report.A2UIMessages, "summary": summary, "receiverOpenDingTalkId": receiver,
 	}
 	raw, err := CallMCPToolDataOnServer(cmd.Context(), "im", "create_and_send_a2ui_card", args)
@@ -203,7 +205,8 @@ func runAicardPreview(cmd *cobra.Command, _ []string) error {
 	}
 	result := map[string]any{
 		"requestAccepted": true, "executed": true, "deliveryVerified": false, "renderingVerified": false,
-		"flowStatus": "PROCESSING", "requestId": requestID, "bizCardId": bizCardID, "receipt": receipt, "preflight": preflight,
+		"flowStatus": "PROCESSING", "summary": summary, "supportForward": supportForward,
+		"requestId": requestID, "bizCardId": bizCardID, "receipt": receipt, "preflight": preflight,
 	}
 	card, _ := receipt["result"].(map[string]any)
 	bizID, _ := card["bizId"].(string)
