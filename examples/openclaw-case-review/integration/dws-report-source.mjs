@@ -97,10 +97,8 @@ export function createDwsReportSource({ readDocument, listEvents, documentId, pe
     const fallbackDate = dateForMeeting(markdown, '兜底会');
     const initialDate = dateForMeeting(markdown, '案例亮点会');
     if (!fallbackDate.startsWith(`${period}-`) || !initialDate.startsWith(`${period}-`)) throw new Error('DWS_MEETING_OUTSIDE_REPORT_PERIOD');
-    const [initialResponse, fallbackResponse] = await Promise.all([
-      listEvents({ context, ...dayRange(initialDate) }),
-      listEvents({ context, ...dayRange(fallbackDate) }),
-    ]);
+    const initialResponse = await listEvents({ context, ...dayRange(initialDate) });
+    const fallbackResponse = await listEvents({ context, ...dayRange(fallbackDate) });
     for (const response of [initialResponse, fallbackResponse]) {
       if (!object(response) || response.success === false) throw new Error('DWS_CALENDAR_READ_UNVERIFIED');
     }
