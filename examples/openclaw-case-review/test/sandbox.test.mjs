@@ -93,11 +93,11 @@ test('confirmation and return deltas never reset input values; unknown is not di
 test('report rendering accepts only supplied facts and clearly preserves missing fields as unverified',()=>{
   const {workflow:w,card:c}=fixture();
   const report={stage:'月度建档完成，会议待召开',meetingMonth:'2026年11月',targetReleaseMonth:'2026年12月',
-    candidates:['Zoolung 宣传片'],risks:['文档和日历的参会人信息需核对'],attendeeStatus:'文档待确认；日历显示一位参会人已接受',manualDecision:'未裁决：两个复选框均未勾选',
+    candidates:['Aurora search flow'],risks:['文档和日历的参会人信息需核对'],attendeeStatus:'文档待确认；日历显示一位参会人已接受',manualDecision:'未裁决：两个复选框均未勾选',
     documentLink:'主文档已核实'};
   const components=buildCard({...c,report})[2].updateComponents.components;
   const text=components.map(c=>c.content??c.text??'').join('\n');
-  assert.match(text,/月度建档完成/);assert.match(text,/Zoolung 宣传片/);assert.match(text,/未裁决/);
+  assert.match(text,/月度建档完成/);assert.match(text,/Aurora search flow/);assert.match(text,/未裁决/);
   assert.match(text,/文档待确认；日历显示一位参会人已接受/);
   const withoutAttendeeStatus=buildCard({...c,report:{...report,attendeeStatus:undefined}})[2].updateComponents.components;
   assert.match(withoutAttendeeStatus.find(x=>x.id==='meetings').content,/未核实：尚未交叉核对文档与日历/);
