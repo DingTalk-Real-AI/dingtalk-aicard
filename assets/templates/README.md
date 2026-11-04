@@ -2,7 +2,7 @@
 
 [Back to the project README](../../README.md) · [Template source index](../../skills/dingtalk-aicard/references/templates/README.md)
 
-Explore nine business scenarios with complete A2UI JSON and rendered screenshots.
+Explore ten business scenarios with complete A2UI JSON and rendered screenshots where available.
 Chinese scene names and sample card copy are intentionally retained to match the
 localized templates. Approval summary includes both tabbed and single-list variants.
 
@@ -26,6 +26,7 @@ integration with your application or service.
 | [Meeting summary · 会后总结](#post-meeting-summary) | Turn meeting conclusions into a readable summary with action items, due dates, and personal follow-up controls. |
 | [Task delegation · 任务处理](#task-delegation) | Select tasks across meeting coordination, communication, and preparation, then hand the selected items to an assistant. |
 | [Weekly work report · 工作周报](#weekly-work-report) | Present completed work, next week’s plans, and risks in a structured report with nested lists. |
+| [Project review and fallback decision · 项目汇报与兜底会决策](#project-review-decision) | Show verified project facts, collect a meeting decision and schedule, preview a change, confirm it, and display the service result in the same card. |
 
 <a id="company-investigation"></a>
 
@@ -124,6 +125,16 @@ Present completed work, next week’s plans, and risks in a structured report wi
 [View the complete A2UI JSON](../../skills/dingtalk-aicard/references/templates/weekly-work-report/a2ui.json)
 
 <a href="images/weekly-work-report.png"><img src="images/weekly-work-report.png" alt="Weekly work report: initial card rendering in the PC Web SDK light theme"></a>
+
+<a id="project-review-decision"></a>
+
+## Project review and fallback decision · 项目汇报与兜底会决策
+
+Present project progress, choose whether a fallback review meeting should take place, edit its time, inspect a server-generated change summary, confirm, and show the result in the same card.
+
+[View the complete A2UI JSON](../../skills/dingtalk-aicard/references/templates/project-review-decision/a2ui.json)
+
+This is a fictional, localized example. Its event names are integration hooks, not built-in DingTalk operations. The service must source and label verified facts, authenticate the caller from trusted transport context, compare current document and calendar versions, generate the proposal summary, require explicit confirmation, perform and read back each write, and update only the existing card. A template check does not validate client rendering or a connected business workflow. No screenshot is included yet.
 
 ## Use a template
 

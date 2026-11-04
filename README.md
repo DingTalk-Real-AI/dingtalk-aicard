@@ -60,10 +60,10 @@ The recordings use sample data and simulated tasks. GIFs focus on the card, are 
 
 ## Built-in templates
 
-Start from one of nine complete business scenarios instead of a blank card: company information,
+Start from one of ten complete business scenarios instead of a blank card: company information,
 morning briefing, today's tasks, approval summary, interview feedback, meeting invitation, meeting
-summary, task delegation, and weekly work report. Each scenario includes editable A2UI JSON and a
-rendered screenshot; approval summary also has a single-list JSON variant.
+summary, task delegation, and weekly work report. Each scenario includes editable A2UI JSON;
+most also include a rendered screenshot. Approval summary also has a single-list JSON variant.
 
 <table>
   <tr>
@@ -88,7 +88,7 @@ rendered screenshot; approval summary also has a single-list JSON variant.
   </tr>
 </table>
 
-**[Browse all nine templates →](assets/templates/README.md)**
+**[Browse all ten templates →](assets/templates/README.md)**
 
 Templates are starting points: replace the sample data and identifiers, connect actions to your
 service, and verify layout and interactions on your target clients. Screenshots show the initial

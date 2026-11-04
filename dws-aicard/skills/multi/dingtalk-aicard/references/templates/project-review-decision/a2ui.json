@@ -1,0 +1,435 @@
+[
+  {
+    "version": "v1.0",
+    "createSurface": {
+      "surfaceId": "demo-project-review-decision",
+      "catalogId": "https://dingtalk.com/card/a2ui/catalogs/public/catalog.json",
+      "dataModel": {
+        "project": {
+          "name": "Aurora release",
+          "period": "2027-03",
+          "status": "Prototype review complete; release checklist is in progress.",
+          "highlights": [
+            "Search flow passed usability review",
+            "Accessibility audit is scheduled"
+          ],
+          "risks": [
+            "Vendor test environment is not yet available"
+          ]
+        },
+        "meeting": {
+          "kind": "fallback review",
+          "start": "2027-03-24T09:00:00+08:00",
+          "end": "2027-03-24T09:30:00+08:00"
+        },
+        "form": {
+          "decision": [],
+          "start": "2027-03-24T09:00:00+08:00",
+          "end": "2027-03-24T09:30:00+08:00"
+        },
+        "proposal": {
+          "summary": ""
+        },
+        "result": {
+          "status": "",
+          "message": ""
+        },
+        "view": {
+          "step": 1
+        },
+        "security": {
+          "requestId": "demo-request-001",
+          "revision": 1,
+          "nonce": "replace-with-server-nonce"
+        }
+      }
+    }
+  },
+  {
+    "version": "v1.0",
+    "updateComponents": {
+      "surfaceId": "demo-project-review-decision",
+      "components": [
+        {
+          "id": "root",
+          "component": "Column",
+          "gap": 12,
+          "children": [
+            "form-pane",
+            "confirm-pane",
+            "result-pane",
+            "error-pane"
+          ]
+        },
+        {
+          "id": "form-pane",
+          "component": "Column",
+          "gap": 12,
+          "visible": {
+            "call": "eq",
+            "args": {
+              "a": {
+                "path": "/view/step"
+              },
+              "b": 1
+            }
+          },
+          "children": [
+            "title",
+            "demo-note",
+            "project-report",
+            "meeting-facts",
+            "decision-title",
+            "decision",
+            "start-title",
+            "start",
+            "end-title",
+            "end",
+            "propose",
+            "form-hint"
+          ]
+        },
+        {
+          "id": "title",
+          "component": "Text",
+          "text": "Project review · fallback meeting",
+          "bold": true
+        },
+        {
+          "id": "demo-note",
+          "component": "Markdown",
+          "content": "**Illustrative sample data.** Replace it with verified project and calendar facts before delivery."
+        },
+        {
+          "id": "project-report",
+          "component": "Markdown",
+          "content": {
+            "path": "/project/summaryMarkdown"
+          }
+        },
+        {
+          "id": "meeting-facts",
+          "component": "Markdown",
+          "content": {
+            "path": "/meeting/summaryMarkdown"
+          }
+        },
+        {
+          "id": "decision-title",
+          "component": "Text",
+          "text": "Should the fallback review meeting take place?",
+          "bold": true
+        },
+        {
+          "id": "decision",
+          "component": "ChoicePicker",
+          "variant": "mutuallyExclusive",
+          "displayStyle": "checkbox",
+          "label": "Choose one decision",
+          "options": [
+            {
+              "label": "Hold the meeting",
+              "value": "hold"
+            },
+            {
+              "label": "Do not hold it",
+              "value": "skip"
+            }
+          ],
+          "value": {
+            "path": "/form/decision"
+          }
+        },
+        {
+          "id": "start-title",
+          "component": "Text",
+          "text": "Start date and time (when holding the meeting)"
+        },
+        {
+          "id": "start",
+          "component": "DateTimeInput",
+          "enableDate": true,
+          "enableTime": true,
+          "label": "Meeting start",
+          "value": {
+            "path": "/form/start"
+          }
+        },
+        {
+          "id": "end-title",
+          "component": "Text",
+          "text": "End date and time (when holding the meeting)"
+        },
+        {
+          "id": "end",
+          "component": "DateTimeInput",
+          "enableDate": true,
+          "enableTime": true,
+          "label": "Meeting end",
+          "value": {
+            "path": "/form/end"
+          }
+        },
+        {
+          "id": "propose",
+          "component": "Button",
+          "child": "propose-label",
+          "variant": "primary",
+          "checks": [
+            {
+              "condition": {
+                "call": "required",
+                "args": {
+                  "value": {
+                    "path": "/form/decision"
+                  }
+                }
+              },
+              "message": "Choose whether to hold the meeting."
+            }
+          ],
+          "action": {
+            "event": {
+              "name": "project_review.propose",
+              "context": {
+                "requestId": {
+                  "path": "/security/requestId"
+                },
+                "revision": {
+                  "path": "/security/revision"
+                },
+                "nonce": {
+                  "path": "/security/nonce"
+                },
+                "form": {
+                  "path": "/form"
+                }
+              }
+            }
+          }
+        },
+        {
+          "id": "propose-label",
+          "component": "Text",
+          "text": "Review proposed changes"
+        },
+        {
+          "id": "form-hint",
+          "component": "Text",
+          "text": "This step previews a server-validated change. It does not write business data.",
+          "variant": "caption",
+          "maxLine": 4
+        },
+        {
+          "id": "confirm-pane",
+          "component": "Column",
+          "gap": 12,
+          "visible": {
+            "call": "eq",
+            "args": {
+              "a": {
+                "path": "/view/step"
+              },
+              "b": 2
+            }
+          },
+          "children": [
+            "confirm-title",
+            "change-summary",
+            "confirm-warning",
+            "confirm",
+            "back"
+          ]
+        },
+        {
+          "id": "confirm-title",
+          "component": "Text",
+          "text": "Review and confirm",
+          "bold": true
+        },
+        {
+          "id": "change-summary",
+          "component": "Markdown",
+          "content": {
+            "path": "/proposal/summary"
+          }
+        },
+        {
+          "id": "confirm-warning",
+          "component": "Markdown",
+          "content": "Confirm only after checking the decision, date, time, and target meeting. The service must revalidate authorization and current versions before writing."
+        },
+        {
+          "id": "confirm",
+          "component": "Button",
+          "child": "confirm-label",
+          "variant": "primary",
+          "action": {
+            "event": {
+              "name": "project_review.confirm",
+              "context": {
+                "requestId": {
+                  "path": "/security/requestId"
+                },
+                "revision": {
+                  "path": "/security/revision"
+                },
+                "nonce": {
+                  "path": "/security/nonce"
+                },
+                "confirmationId": {
+                  "path": "/proposal/confirmationId"
+                }
+              }
+            }
+          }
+        },
+        {
+          "id": "confirm-label",
+          "component": "Text",
+          "text": "Confirm changes"
+        },
+        {
+          "id": "back",
+          "component": "Button",
+          "child": "back-label",
+          "action": {
+            "event": {
+              "name": "project_review.back",
+              "context": {
+                "requestId": {
+                  "path": "/security/requestId"
+                },
+                "revision": {
+                  "path": "/security/revision"
+                },
+                "nonce": {
+                  "path": "/security/nonce"
+                }
+              }
+            }
+          }
+        },
+        {
+          "id": "back-label",
+          "component": "Text",
+          "text": "Return to edit"
+        },
+        {
+          "id": "result-pane",
+          "component": "Column",
+          "gap": 8,
+          "visible": {
+            "call": "eq",
+            "args": {
+              "a": {
+                "path": "/view/step"
+              },
+              "b": 3
+            }
+          },
+          "children": [
+            "result-title",
+            "result-status",
+            "result-message"
+          ]
+        },
+        {
+          "id": "result-title",
+          "component": "Text",
+          "text": "Project review result",
+          "bold": true
+        },
+        {
+          "id": "result-status",
+          "component": "Text",
+          "text": {
+            "path": "/result/status"
+          },
+          "bold": true
+        },
+        {
+          "id": "result-message",
+          "component": "Markdown",
+          "content": {
+            "path": "/result/message"
+          }
+        },
+        {
+          "id": "error-pane",
+          "component": "Column",
+          "gap": 8,
+          "visible": {
+            "call": "eq",
+            "args": {
+              "a": {
+                "path": "/view/step"
+              },
+              "b": 4
+            }
+          },
+          "children": [
+            "error-title",
+            "error-message",
+            "error-back"
+          ]
+        },
+        {
+          "id": "error-title",
+          "component": "Text",
+          "text": "The request could not be completed",
+          "bold": true
+        },
+        {
+          "id": "error-message",
+          "component": "Text",
+          "text": {
+            "path": "/result/message"
+          }
+        },
+        {
+          "id": "error-back",
+          "component": "Button",
+          "child": "error-back-label",
+          "action": {
+            "event": {
+              "name": "project_review.back",
+              "context": {
+                "requestId": {
+                  "path": "/security/requestId"
+                },
+                "revision": {
+                  "path": "/security/revision"
+                },
+                "nonce": {
+                  "path": "/security/nonce"
+                }
+              }
+            }
+          }
+        },
+        {
+          "id": "error-back-label",
+          "component": "Text",
+          "text": "Return to edit"
+        }
+      ]
+    }
+  },
+  {
+    "version": "v1.0",
+    "updateDataModel": {
+      "surfaceId": "demo-project-review-decision",
+      "path": "/project/summaryMarkdown",
+      "value": "### Project status\nPrototype review complete; release checklist is in progress.\n\n**Highlights**\n- Search flow passed usability review\n- Accessibility audit is scheduled\n\n**Open risk**\n- Vendor test environment is not yet available"
+    }
+  },
+  {
+    "version": "v1.0",
+    "updateDataModel": {
+      "surfaceId": "demo-project-review-decision",
+      "path": "/meeting/summaryMarkdown",
+      "value": "**Review period:** 2027-03\n\n**Current fallback meeting:** 2027-03-24, 09:00–09:30 (UTC+08:00)\n\n**Decision record:** Not yet verified"
+    }
+  }
+]
