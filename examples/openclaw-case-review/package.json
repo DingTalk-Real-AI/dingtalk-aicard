@@ -4,10 +4,24 @@
   "private": true,
   "type": "module",
   "main": "index.mjs",
-  "files": ["index.mjs", "plugin/", "src/", "integration/", "openclaw.plugin.json"],
-  "engines": { "node": ">=24" },
-  "peerDependencies": { "openclaw": ">=2026.10.9" },
-  "peerDependenciesMeta": { "openclaw": { "optional": true } },
+  "files": [
+    "index.mjs",
+    "plugin/",
+    "src/",
+    "integration/",
+    "openclaw.plugin.json"
+  ],
+  "engines": {
+    "node": ">=24"
+  },
+  "peerDependencies": {
+    "openclaw": ">=2026.10.9"
+  },
+  "peerDependenciesMeta": {
+    "openclaw": {
+      "optional": true
+    }
+  },
   "scripts": {
     "test": "node --test test/*.test.mjs",
     "validate": "node --check index.mjs && node --check plugin/index.mjs && node --check plugin/business-test.mjs && node --check plugin/config.mjs && node --check src/card.mjs && node --check src/sandbox.mjs && node --check integration/callback.mjs && node --check integration/dws-cli-reader.mjs && node --check integration/dws-report-source.mjs"

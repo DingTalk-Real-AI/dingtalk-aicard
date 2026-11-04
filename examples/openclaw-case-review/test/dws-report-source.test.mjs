@@ -29,10 +29,14 @@ const events = [
 ];
 
 test('DWS report source returns verified document/calendar facts and highlights attendee drift', async () => {
+  const eventReads=[];
   const source = createDwsReportSource({
     documentId: 'doc-1', periodStart: '2026-11-01T00:00:00+08:00', periodEnd: '2026-12-01T00:00:00+08:00',
     readDocument: async () => ({ success: true, complete: true, content: { nodeId: 'doc-1', docUrl: 'https://example.invalid/doc-1', markdown } }),
-    listEvents: async () => ({ success: true, result: { events, hasMore: false } }),
+    listEvents: async ({start,end}) => {
+      eventReads.push({start,end});
+      return { success: true, result: { events: events.filter(event=>event.start.dateTime>=start&&event.start.dateTime<end), hasMore: false } };
+    },
     now: () => '2026-11-05T09:00:00+08:00',
   });
   const report = await source({ senderName: '当前用户' });
@@ -42,6 +46,10 @@ test('DWS report source returns verified document/calendar facts and highlights 
   assert.match(report.attendeeStatus, /文档写.*待确认/);
   assert.match(report.attendeeStatus, /已接受参会人/);
   assert.equal(report.manualDecision, '未裁决：开/不开均未勾选');
+  assert.deepEqual(eventReads,[
+    {start:'2026-11-10T00:00:00+08:00',end:'2026-11-11T00:00:00+08:00'},
+    {start:'2026-11-25T00:00:00+08:00',end:'2026-11-26T00:00:00+08:00'},
+  ]);
 });
 
 test('DWS report source fails closed for ambiguous or unconfirmed fallback meetings', async () => {

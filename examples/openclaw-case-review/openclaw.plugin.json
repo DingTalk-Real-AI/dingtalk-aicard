@@ -4,33 +4,78 @@
   "version": "0.1.0",
   "description": "Reference OpenClaw plugin for a private project review A2UI card with a sandbox-only workflow.",
   "main": "index.mjs",
-  "contracts": { "tools": ["project_review_a2ui_private_sandbox"] },
+  "contracts": {
+    "tools": [
+      "project_review_a2ui_private_sandbox"
+    ]
+  },
   "configSchema": {
     "type": "object",
     "additionalProperties": false,
-    "required": ["privateTest", "report"],
+    "required": [
+      "privateTest",
+      "report"
+    ],
     "properties": {
       "privateTest": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["accountId", "senderId", "sessionKey", "robotCode"],
+        "required": [
+          "accountId",
+          "senderId",
+          "sessionKey",
+          "robotCode"
+        ],
         "properties": {
-          "accountId": { "type": "string", "minLength": 1 },
-          "senderId": { "type": "string", "minLength": 1 },
-          "sessionKey": { "type": "string", "minLength": 1 },
-          "robotCode": { "type": "string", "minLength": 1 }
+          "accountId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "senderId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sessionKey": {
+            "type": "string",
+            "minLength": 1
+          },
+          "robotCode": {
+            "type": "string",
+            "minLength": 1
+          }
         }
       },
       "report": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["profile", "dwsCliEntry", "documentId", "periodStart", "periodEnd"],
+        "required": [
+          "profile",
+          "dwsCliEntry",
+          "documentId",
+          "periodStart",
+          "periodEnd"
+        ],
         "properties": {
-          "profile": { "type": "string", "minLength": 1 },
-          "dwsCliEntry": { "type": "string", "minLength": 1 },
-          "documentId": { "type": "string", "minLength": 1 },
-          "periodStart": { "type": "string", "format": "date-time" },
-          "periodEnd": { "type": "string", "format": "date-time" }
+          "profile": {
+            "type": "string",
+            "minLength": 1
+          },
+          "dwsCliEntry": {
+            "type": "string",
+            "minLength": 1
+          },
+          "documentId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "periodStart": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "periodEnd": {
+            "type": "string",
+            "format": "date-time"
+          }
         }
       }
     }

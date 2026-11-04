@@ -13,10 +13,27 @@ function section(markdown, heading) {
   return match?.[1] ?? '';
 }
 
-function meetingFromEvents(events, summaries, period, label) {
+function dateForMeeting(markdown, label) {
+  const candidates = [];
+  for (const line of text(markdown).split(/\r?\n/u)) {
+    const match = line.match(new RegExp(`${label}[^\\d]*(\\d{4}-\\d{2}-\\d{2})`, 'u'));
+    if (match) candidates.push(match[1]);
+  }
+  const unique = [...new Set(candidates)];
+  if (unique.length !== 1) throw new Error(`${label === '兜底会' ? 'FALLBACK' : 'INITIAL'}_MEETING_DATE_NOT_UNIQUE`);
+  return unique[0];
+}
+
+function dayRange(date) {
+  const [year, month, day] = date.split('-').map(Number);
+  const nextDate = new Date(Date.UTC(year, month - 1, day + 1)).toISOString().slice(0, 10);
+  return { start: `${date}T00:00:00+08:00`, end: `${nextDate}T00:00:00+08:00` };
+}
+
+function meetingFromEvents(events, summaries, date, label) {
   const matches = events.filter(event => object(event)
     && summaries.some(summary => text(event.summary).includes(summary))
-    && text(event.start?.dateTime).slice(0, 7) === period
+    && text(event.start?.dateTime).slice(0, 10) === date
     && text(event.end?.dateTime));
   if (matches.length !== 1) throw new Error(`${label}_MEETING_NOT_UNIQUE`);
   const event = matches[0];
@@ -70,24 +87,31 @@ export function createDwsReportSource({ readDocument, listEvents, documentId, pe
   requireFunction(listEvents, 'LIST_EVENTS');
   if (!text(documentId) || !text(periodStart) || !text(periodEnd)) throw new Error('DWS_REPORT_RANGE_REQUIRED');
   return async function reportSource(context) {
-    const [documentResponse, calendarResponse] = await Promise.all([
-      readDocument({ context, documentId }),
-      listEvents({ context, start: periodStart, end: periodEnd }),
-    ]);
-    if (!object(documentResponse) || documentResponse.success === false) throw new Error('DWS_DOCUMENT_READ_UNVERIFIED');
+    const documentResponse = await readDocument({ context, documentId });
+    if (!object(documentResponse) || documentResponse.success === false || documentResponse.complete === false) throw new Error('DWS_DOCUMENT_READ_UNVERIFIED');
     const document = object(documentResponse.content) ? documentResponse.content : documentResponse;
-    if (!object(calendarResponse) || calendarResponse.success === false) throw new Error('DWS_CALENDAR_READ_UNVERIFIED');
-    const calendar = object(calendarResponse.result) ? calendarResponse.result : calendarResponse;
     if (!object(document) || !text(document.markdown)) throw new Error('DWS_DOCUMENT_READ_UNVERIFIED');
-    if (!object(calendar) || calendar.hasMore === true || calendar.complete === false) {
-      throw new Error('DWS_CALENDAR_READ_INCOMPLETE');
-    }
-    const events = Array.isArray(calendar.events) ? calendar.events : [];
     const markdown = document.markdown;
     const meetingMonth = (markdown.match(/会议月份：\s*([^\n]+)/u)?.[1] ?? '').trim();
     const period = /^\d{4}-\d{2}/u.test(meetingMonth) ? meetingMonth.slice(0, 7) : periodStart.slice(0, 7);
-    const fallback = meetingFromEvents(events, ['兜底会'], period, 'FALLBACK');
-    const initial = meetingFromEvents(events, ['案例亮点会', '初筛会'], period, 'INITIAL');
+    const fallbackDate = dateForMeeting(markdown, '兜底会');
+    const initialDate = dateForMeeting(markdown, '案例亮点会');
+    if (!fallbackDate.startsWith(`${period}-`) || !initialDate.startsWith(`${period}-`)) throw new Error('DWS_MEETING_OUTSIDE_REPORT_PERIOD');
+    const [initialResponse, fallbackResponse] = await Promise.all([
+      listEvents({ context, ...dayRange(initialDate) }),
+      listEvents({ context, ...dayRange(fallbackDate) }),
+    ]);
+    for (const response of [initialResponse, fallbackResponse]) {
+      if (!object(response) || response.success === false) throw new Error('DWS_CALENDAR_READ_UNVERIFIED');
+    }
+    const initialCalendar = object(initialResponse.result) ? initialResponse.result : initialResponse;
+    const fallbackCalendar = object(fallbackResponse.result) ? fallbackResponse.result : fallbackResponse;
+    if (initialCalendar.hasMore === true || initialCalendar.complete === false
+      || fallbackCalendar.hasMore === true || fallbackCalendar.complete === false) throw new Error('DWS_CALENDAR_READ_INCOMPLETE');
+    const initialEvents = Array.isArray(initialCalendar.events) ? initialCalendar.events : [];
+    const fallbackEvents = Array.isArray(fallbackCalendar.events) ? fallbackCalendar.events : [];
+    const fallback = meetingFromEvents(fallbackEvents, ['兜底会'], fallbackDate, 'FALLBACK');
+    const initial = meetingFromEvents(initialEvents, ['案例亮点会', '初筛会'], initialDate, 'INITIAL');
     if (fallback.status !== 'confirmed') throw new Error('FALLBACK_MEETING_NOT_CONFIRMED');
     const risksSection = section(markdown, '风险与待确认事项');
     const risks = risksSection.split(/\r?\n/u).map(line => line.replace(/^\s*[-*]\s*/u, '').trim())
