@@ -269,6 +269,7 @@ For live execution, send successive complete message batches as work progresses.
 | [Functions](skills/dingtalk-aicard/references/index/functions.md) | Function contracts and host actions |
 | [Visual Tokens](skills/dingtalk-aicard/references/index/tokens.md) | Colors, typography, and icon references |
 | [Form and event example](spec/examples/form-interaction.json) · [Host actions](spec/examples/host-action.json) | Input bindings and interaction message shapes |
+| [OpenClaw project review integration](examples/openclaw-case-review/README.md) | Reference plugin with a sandbox workflow, injected DWS readers, trusted card callbacks, and same-card deltas |
 | [Scenario examples](spec/examples/README.md) | Complete A2UI examples to adapt |
 | [Standalone Skill](skills/dingtalk-aicard/SKILL.md) · [DWS Skill](dws-aicard/skills/multi/dingtalk-aicard/SKILL.md) | Authoring workflows and execution-specific instructions |
 | [DWS build and integration](CONTRIBUTING.md#native-dws-build) | Native module integration and reproducible builds |
