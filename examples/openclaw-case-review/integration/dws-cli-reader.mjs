@@ -1,23 +1,36 @@
-import { execFile } from 'node:child_process';
 import { isAbsolute } from 'node:path';
 
 const valid = value => typeof value === 'string' && value.trim().length > 0 && value.length <= 2048;
 const object = value => !!value && typeof value === 'object' && !Array.isArray(value);
 
-function runJson(execFileImpl, executable, entry, args, timeoutMs, maxBuffer) {
-  return new Promise((resolve, reject) => {
-    execFileImpl(executable, [entry, ...args], {
-      encoding: 'utf8', timeout: timeoutMs, maxBuffer, windowsHide: true, shell: false,
-    }, (error, stdout) => {
-      if (error) return reject(new Error('DWS_READ_COMMAND_FAILED'));
-      try { resolve(JSON.parse(stdout)); }
-      catch { reject(new Error('DWS_READ_RETURNED_INVALID_JSON')); }
-    });
-  });
+async function hostCommand(argv, options) {
+  const { runUtf8CommandWithTimeout } = await import('openclaw/plugin-sdk/process-runtime');
+  return runUtf8CommandWithTimeout(argv, options);
 }
 
-/** Run only fixed, read-only DWS CLI commands; no shell, retries, or output logging. */
-export function createDwsCliReaders({ dwsCliEntry, profile, execFileImpl = execFile, executable = process.execPath,
+async function runJson(commandImpl, executable, entry, args, timeoutMs, maxBuffer, signal) {
+  let result;
+  try {
+    result = await commandImpl([executable, entry, ...args], {
+      timeoutMs,
+      ...(signal ? { signal } : {}),
+      killProcessTree: true,
+      requireProcessTreeExtinction: true,
+      maxOutputBytes: { stdout: maxBuffer, stderr: 16_384 },
+      outputCapture: 'head',
+      terminateOnOutputLimit: true,
+    });
+  } catch { throw new Error('DWS_READ_COMMAND_FAILED'); }
+  if (!result || result.code !== 0 || result.killed || result.outputLimitExceeded
+    || (result.stdoutTruncatedBytes ?? 0) > 0 || typeof result.stdout !== 'string') {
+    throw new Error('DWS_READ_COMMAND_FAILED');
+  }
+  try { return JSON.parse(result.stdout); }
+  catch { throw new Error('DWS_READ_RETURNED_INVALID_JSON'); }
+}
+
+/** Run only fixed, read-only DWS CLI commands with bounded output and process-tree cleanup. */
+export function createDwsCliReaders({ dwsCliEntry, profile, commandImpl = hostCommand, executable = process.execPath,
   timeoutMs = 15000, maxBuffer = 1_048_576 }) {
   if (!valid(dwsCliEntry) || !isAbsolute(dwsCliEntry) || !valid(profile) || !valid(executable)) {
     throw new Error('DWS_CLI_ENTRY_AND_PROFILE_REQUIRED');
@@ -29,7 +42,7 @@ export function createDwsCliReaders({ dwsCliEntry, profile, execFileImpl = execF
   return Object.freeze({
     readDocument({ documentId }) {
       if (!valid(documentId)) throw new Error('DWS_DOCUMENT_ID_REQUIRED');
-      return runJson(execFileImpl, executable, dwsCliEntry,
+      return runJson(commandImpl, executable, dwsCliEntry,
         ['doc', '+fetch', '--node', documentId, '--profile', profile, '--format', 'json'], timeoutMs, maxBuffer);
     },
     async listEvents({ start, end }) {
@@ -42,7 +55,7 @@ export function createDwsCliReaders({ dwsCliEntry, profile, execFileImpl = execF
         const args = ['calendar', 'event', 'list', '--start', start, '--end', end, '--profile', profile, '--limit', '100'];
         if (cursor) args.push('--cursor', cursor);
         args.push('--format', 'json');
-        const response = await runJson(execFileImpl, executable, dwsCliEntry, args, timeoutMs, maxBuffer);
+        const response = await runJson(commandImpl, executable, dwsCliEntry, args, timeoutMs, maxBuffer);
         if (response?.success !== true) throw new Error('DWS_CALENDAR_READ_UNVERIFIED');
         const body = object(response.result) ? response.result : response;
         if (!Array.isArray(body.events)) throw new Error('DWS_CALENDAR_READ_INVALID');

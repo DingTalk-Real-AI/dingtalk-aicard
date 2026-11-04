@@ -31,7 +31,7 @@ Configure the OpenClaw plugin locally with deployment-owned values; do not commi
 }
 ```
 
-The `integration/dws-cli-reader.mjs` adapter runs only fixed read-only DWS CLI commands through Node `execFile` with `shell: false`, a bounded timeout, and no retries. It follows returned calendar cursors. `integration/dws-report-source.mjs` requires complete reads, unique confirmed meetings, and exposes document/calendar attendee differences. DWS authentication remains in the local DWS profile; no token is stored in the plugin.
+The `integration/dws-cli-reader.mjs` adapter uses OpenClaw's public `runUtf8CommandWithTimeout` process helper (OpenClaw 2026.10.9 or later) to run only fixed read-only DWS CLI argument vectors. It bounds execution time and output, requests process-tree cleanup, and makes no retries. It follows returned calendar cursors. `integration/dws-report-source.mjs` requires complete reads, unique confirmed meetings, and exposes document/calendar attendee differences. DWS authentication remains in the local DWS profile; no token is stored in the plugin.
 
 The `plugin/business-test.mjs` state machine rejects untrusted callbacks and checks the card instance, user, nonce, revision, TTL, action allowlist, and callback idempotency before updating the card. The Connector bridge remains responsible for robot identity, card creation/update, and the existing Stream connection.
 
