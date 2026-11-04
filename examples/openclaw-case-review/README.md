@@ -9,9 +9,9 @@ This example shows how an OpenClaw business plugin can use a Connector-provided 
 - preserve form input when returning to edit;
 - apply a sandbox result and update the same card.
 
-The example is intentionally business-neutral. It contains no DingTalk tenant IDs, user IDs, robot codes, document IDs, credentials, or live DWS client. The host supplies those through deployment configuration and a trusted report provider.
+The example is intentionally business-neutral. It contains no DingTalk tenant IDs, user IDs, robot codes, document IDs, or credentials. The deployment config supplies the approved private scope, one DWS Profile, the local DWS JS entry point, and the report document and date range.
 
-The `integration/dws-report-source.mjs` adapter is read-only. It accepts injected document and calendar readers, requires complete calendar pagination and unique confirmed meetings, and exposes document/calendar attendee differences. A production adapter must use the same authenticated DWS profile for both reads, then implement writes and readback separately after user acceptance.
+The `integration/dws-cli-reader.mjs` adapter runs only fixed read-only DWS CLI commands through Node `execFile` with `shell: false`, a bounded timeout, and no retries. It follows returned calendar cursors. `integration/dws-report-source.mjs` requires complete reads, unique confirmed meetings, and exposes document/calendar attendee differences. DWS authentication remains in the local DWS profile; no token is stored in the plugin.
 
 The `plugin/business-test.mjs` state machine rejects untrusted callbacks and checks the card instance, user, nonce, revision, TTL, action allowlist, and callback idempotency before updating the card. The Connector bridge remains responsible for robot identity, card creation/update, and the existing Stream connection.
 

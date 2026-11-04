@@ -33,7 +33,7 @@ function nonceMatches(value, expected) {
 }
 
 export class BusinessA2UITest {
-  constructor({ databasePath, bridge, policy, reportProvider, reportOptions, now = Date.now, ttlMs = 300000 }) {
+  constructor({ databasePath, bridge, policy, reportProvider, now = Date.now, ttlMs = 300000 }) {
     if (!databasePath || !bridge || !policy) throw new Error('EXPLICIT_BUSINESS_TEST_DEPENDENCIES_REQUIRED');
     if (reportProvider !== undefined && typeof reportProvider !== 'function') throw new Error('INVALID_REPORT_PROVIDER');
     if (ttlMs < 10000 || ttlMs > 1800000) throw new Error('INVALID_LIMITS');
@@ -43,7 +43,6 @@ export class BusinessA2UITest {
     this.authorize = createPrivateTestAuthorizer(policy);
     this.policy = policy;
     this.reportProvider = reportProvider;
-    this.reportOptions = reportOptions;
     this.now = now;
     this.ttlMs = ttlMs;
     this.cards = new Map();
@@ -64,7 +63,7 @@ export class BusinessA2UITest {
     const previous = this.transport.byRequest(callId);
     if (previous) return { status: previous.lastOutcome ?? 'unknown', outTrackId: previous.outTrackId, reused: true, readback: 'unverified', rendering: 'unverified' };
     let report;
-    try { report = await this.reportProvider(context, this.reportOptions); } catch { /* fail closed below */ }
+    try { report = await this.reportProvider(context); } catch { /* fail closed below */ }
     if (!record(report)) return { status: 'rejected', reason: 'REPORT_SOURCE_UNAVAILABLE' };
     const start = report.fallbackStart;
     const end = report.fallbackEnd;

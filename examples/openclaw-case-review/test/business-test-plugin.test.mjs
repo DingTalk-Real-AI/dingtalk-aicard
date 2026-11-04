@@ -18,7 +18,7 @@ function setup() {
   };
   const report={stage:'月度建档完成，会议待召开',meetingMonth:'2026年11月',targetReleaseMonth:'2026年12月',
     manualDecision:'未裁决：开/不开均未勾选',fallbackStart:'2026-11-25T10:30:00+08:00',fallbackEnd:'2026-11-25T11:30:00+08:00'};
-  const adapter=new BusinessA2UITest({databasePath:join(directory,'cards.sqlite'),bridge,policy,reportProvider:async()=>report,reportOptions:{source:'test'},now:()=>clock});
+  const adapter=new BusinessA2UITest({databasePath:join(directory,'cards.sqlite'),bridge,policy,reportProvider:async()=>report,now:()=>clock});
   return {adapter,bridge,context,updates,directory,report};
 }
 

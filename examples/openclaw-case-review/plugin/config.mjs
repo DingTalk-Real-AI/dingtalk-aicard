@@ -10,7 +10,7 @@ export function parsePluginConfig(value) {
   for (const key of ['accountId', 'senderId', 'sessionKey', 'robotCode']) {
     if (!nonEmpty(scope[key])) throw new Error(`PRIVATE_TEST_${key.toUpperCase()}_REQUIRED`);
   }
-  for (const key of ['documentId', 'periodStart', 'periodEnd']) {
+  for (const key of ['profile', 'dwsCliEntry', 'documentId', 'periodStart', 'periodEnd']) {
     if (!nonEmpty(report[key])) throw new Error(`REPORT_${key.toUpperCase()}_REQUIRED`);
   }
   const periodStart = Date.parse(report.periodStart);
@@ -25,6 +25,8 @@ export function parsePluginConfig(value) {
     }),
     report: Object.freeze({
       documentId: report.documentId,
+      profile: report.profile,
+      dwsCliEntry: report.dwsCliEntry,
       periodStart: report.periodStart,
       periodEnd: report.periodEnd,
       ...(nonEmpty(report.profile) ? { profile: report.profile } : {}),

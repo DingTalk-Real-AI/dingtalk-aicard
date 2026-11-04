@@ -2,8 +2,10 @@ import { mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { resolveStateDir } from 'openclaw/plugin-sdk/state-paths';
 import { BusinessA2UITest } from './business-test.mjs';
-import { getA2UIBridge, REPORT_SOURCE_SYMBOL } from './bridge.mjs';
+import { getA2UIBridge } from './bridge.mjs';
 import { parsePluginConfig } from './config.mjs';
+import { createDwsCliReaders } from '../integration/dws-cli-reader.mjs';
+import { createDwsReportSource } from '../integration/dws-report-source.mjs';
 
 const TOOL = 'project_review_a2ui_private_sandbox';
 let registered = false;
@@ -28,10 +30,11 @@ export function register(api) {
     id: 'project-review-a2ui-sandbox',
     start() {
       const bridge = getA2UIBridge();
-      const reportProvider = globalThis[REPORT_SOURCE_SYMBOL];
-      if (!bridge || typeof reportProvider !== 'function') return;
+      if (!bridge) return;
       mkdirSync(join(resolveStateDir(), 'project-review-a2ui'), { recursive: true });
-      workflow = new BusinessA2UITest({ databasePath, bridge, policy, reportProvider, reportOptions: report });
+      const readers = createDwsCliReaders(report);
+      const reportProvider = createDwsReportSource({ ...readers, ...report });
+      workflow = new BusinessA2UITest({ databasePath, bridge, policy, reportProvider });
       workflow.unsubscribe = bridge.onCardAction?.(event => workflow?.handleAction(event));
     },
     stop,

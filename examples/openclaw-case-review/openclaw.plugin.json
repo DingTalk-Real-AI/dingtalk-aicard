@@ -24,9 +24,10 @@
       "report": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["documentId", "periodStart", "periodEnd"],
+        "required": ["profile", "dwsCliEntry", "documentId", "periodStart", "periodEnd"],
         "properties": {
           "profile": { "type": "string", "minLength": 1 },
+          "dwsCliEntry": { "type": "string", "minLength": 1 },
           "documentId": { "type": "string", "minLength": 1 },
           "periodStart": { "type": "string", "format": "date-time" },
           "periodEnd": { "type": "string", "format": "date-time" }
