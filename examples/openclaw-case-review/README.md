@@ -9,6 +9,8 @@ This example shows how an OpenClaw business plugin can use a Connector-provided 
 - preserve form input when returning to edit;
 - apply a sandbox result and update the same card.
 
+See [DEPLOYMENT.md](DEPLOYMENT.md) for the release, activation, acceptance, and rollback boundary.
+
 The example is intentionally business-neutral. It contains no DingTalk tenant IDs, user IDs, robot codes, document IDs, or credentials. The deployment config supplies the approved private scope, one DWS Profile, the local DWS JS entry point, and the report document and date range.
 
 Configure the OpenClaw plugin locally with deployment-owned values; do not commit the filled file:
