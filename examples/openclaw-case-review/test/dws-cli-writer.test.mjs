@@ -28,6 +28,11 @@ test('DWS writer uses fixed commands, profile, explicit confirmation, and readba
   assert.deepEqual(fake.calls[0].argv, ['/usr/bin/node', '/opt/dws/bin/dws.js', 'doc', '+update', '--node', 'doc-1', '--command', 'str_replace', '--old', '- [ ] 开', '--new', '- [x] 开', '--profile', 'corp:user', '--format', 'json', '--yes']);
   assert.ok(fake.calls[1].argv.includes('calendar', '+reschedule', '--event', 'event-1'));
   assert.ok(fake.calls[2].argv.includes('calendar', 'event', 'delete', '--id', 'event-1'));
+  assert.equal(fake.calls[0].argv.at(-1), '--yes');
+  assert.equal(fake.calls[1].argv.at(-1), '--yes');
+  assert.equal(fake.calls[2].argv.at(-1), '--yes');
+  assert.equal(fake.calls[3].argv.at(-1), 'json');
+  assert.equal(fake.calls[4].argv.at(-1), 'json');
   assert.equal(fake.calls.every(call => call.options.killProcessTree && call.options.requireProcessTreeExtinction), true);
 });
 

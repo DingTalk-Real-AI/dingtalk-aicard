@@ -44,29 +44,30 @@ export function createDwsCliWriter({ dwsCliEntry, profile, commandImpl = hostCom
     || !Number.isSafeInteger(maxBuffer) || maxBuffer < 4096 || maxBuffer > 4_194_304) {
     throw new Error('DWS_WRITE_LIMITS_INVALID');
   }
-  const run = args => runJson(commandImpl, executable, dwsCliEntry, [...args, '--profile', profile, '--format', 'json', '--yes'], timeoutMs, maxBuffer);
+  const run = (args, confirmed) => runJson(commandImpl, executable, dwsCliEntry,
+    [...args, '--profile', profile, '--format', 'json', ...(confirmed ? ['--yes'] : [])], timeoutMs, maxBuffer);
   return Object.freeze({
     updateDocumentDecision({ documentId, oldText, newText }) {
       if (!valid(documentId) || !valid(oldText) || typeof newText !== 'string' || newText.length > 32768) throw new Error('DWS_DOCUMENT_DECISION_INPUT_INVALID');
-      return run(['doc', '+update', '--node', documentId, '--command', 'str_replace', '--old', oldText, '--new', newText]);
+      return run(['doc', '+update', '--node', documentId, '--command', 'str_replace', '--old', oldText, '--new', newText], true);
     },
     rescheduleEvent({ eventId, start, end }) {
       if (!valid(eventId)) throw new Error('DWS_EVENT_ID_REQUIRED');
       assertIso(start, 'DWS_EVENT_START'); assertIso(end, 'DWS_EVENT_END');
       if (Date.parse(start) >= Date.parse(end)) throw new Error('DWS_EVENT_RANGE_INVALID');
-      return run(['calendar', '+reschedule', '--event', eventId, '--start', start, '--end', end]);
+      return run(['calendar', '+reschedule', '--event', eventId, '--start', start, '--end', end], true);
     },
     cancelEvent({ eventId }) {
       if (!valid(eventId)) throw new Error('DWS_EVENT_ID_REQUIRED');
-      return run(['calendar', 'event', 'delete', '--id', eventId]);
+      return run(['calendar', 'event', 'delete', '--id', eventId], true);
     },
     readDocument({ documentId }) {
       if (!valid(documentId)) throw new Error('DWS_DOCUMENT_ID_REQUIRED');
-      return run(['doc', '+fetch', '--node', documentId]);
+      return run(['doc', '+fetch', '--node', documentId], false);
     },
     readEvent({ eventId }) {
       if (!valid(eventId)) throw new Error('DWS_EVENT_ID_REQUIRED');
-      return run(['calendar', 'event', 'get', '--id', eventId]);
+      return run(['calendar', 'event', 'get', '--id', eventId], false);
     },
   });
 }
