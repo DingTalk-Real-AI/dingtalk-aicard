@@ -33,9 +33,10 @@ function nonceMatches(value, expected) {
 }
 
 export class BusinessA2UITest {
-  constructor({ databasePath, bridge, policy, reportProvider, now = Date.now, ttlMs = 300000 }) {
+  constructor({ databasePath, bridge, policy, reportProvider, decisionApplier, now = Date.now, ttlMs = 300000 }) {
     if (!databasePath || !bridge || !policy) throw new Error('EXPLICIT_BUSINESS_TEST_DEPENDENCIES_REQUIRED');
     if (reportProvider !== undefined && typeof reportProvider !== 'function') throw new Error('INVALID_REPORT_PROVIDER');
+    if (decisionApplier !== undefined && typeof decisionApplier !== 'function') throw new Error('INVALID_DECISION_APPLIER');
     if (ttlMs < 10000 || ttlMs > 1800000) throw new Error('INVALID_LIMITS');
     this.transport = new CardStore(databasePath);
     this.business = new SandboxWorkflow(`${databasePath}.business`, { now });
@@ -43,6 +44,7 @@ export class BusinessA2UITest {
     this.authorize = createPrivateTestAuthorizer(policy);
     this.policy = policy;
     this.reportProvider = reportProvider;
+    this.decisionApplier = decisionApplier;
     this.now = now;
     this.ttlMs = ttlMs;
     this.cards = new Map();
@@ -101,7 +103,7 @@ export class BusinessA2UITest {
     }
     this.transport.outcome(row.outTrackId, 'creating', 'accepted', { status: 'accepted', receipt: { cardInstanceId: sent.cardInstanceId } });
     if (!this.transport.bindInstance(sent.cardInstanceId, row.outTrackId)) return { status: 'unknown', reason: 'CARD_MAPPING_NOT_SAVED' };
-    this.cards.set(row.outTrackId, { ...row, cardId: card.id, cardInstanceId: sent.cardInstanceId, messages, context });
+    this.cards.set(row.outTrackId, { ...row, cardId: card.id, cardInstanceId: sent.cardInstanceId, messages, context, report });
     return { status: 'accepted', outTrackId: row.outTrackId, cardInstanceId: sent.cardInstanceId, readback: 'unverified', rendering: 'unverified', interaction: 'unverified' };
   }
 
@@ -160,7 +162,30 @@ export class BusinessA2UITest {
         this.transport.finishCallback(event.messageId, 'rejected');
         return { status: 'rejected', reason: 'CONFIRMATION_REQUIRED_OR_STALE' };
       }
-      const result = this.business.confirm(live.cardId, confirmationId, p, { confirmed: true });
+      let result;
+      if (this.decisionApplier) {
+        const pending = this.business.confirmation(live.cardId, confirmationId);
+        if (!pending) {
+          this.transport.finishCallback(event.messageId, 'rejected');
+          return { status: 'rejected', reason: 'CONFIRMATION_NOT_FOUND' };
+        }
+        try {
+          result = await this.decisionApplier({
+            report: live.report,
+            change: pending.change,
+            freshReport: () => this.reportProvider(context),
+          });
+          if (result?.state === 'completed') {
+            try { this.business.confirm(live.cardId, confirmationId, p, { confirmed: true }); }
+            catch { result = { ...result, ledger: 'unknown', message: `${result.message} 本地审计回写待核对。` }; }
+          }
+        } catch (error) {
+          result = { mode: 'dws', state: 'failed', document: 'unchanged', calendar: 'unchanged',
+            message: `DWS 写入未完成：${error?.message ?? '未知错误'}` };
+        }
+      } else {
+        result = this.business.confirm(live.cardId, confirmationId, p, { confirmed: true });
+      }
       const delta = resultDelta(live.messages, result);
       const update = await this.bridge.updateCard({ cardInstanceId: instance, outTrackId: row.outTrackId, outUpdateId: randomUUID(),
         status: 'FINISH', messages: delta }).catch(() => ({ status: 'unknown' }));

@@ -5,6 +5,8 @@ import { BusinessA2UITest } from './business-test.mjs';
 import { getA2UIBridge } from './bridge.mjs';
 import { parsePluginConfig } from './config.mjs';
 import { createDwsCliReaders } from '../integration/dws-cli-reader.mjs';
+import { createDwsCliWriter } from '../integration/dws-cli-writer.mjs';
+import { applyDwsDecision } from '../integration/dws-business-writer.mjs';
 import { createDwsReportSource } from '../integration/dws-report-source.mjs';
 
 const TOOL = 'project_review_a2ui_private_sandbox';
@@ -34,7 +36,9 @@ export function register(api) {
       mkdirSync(join(resolveStateDir(), 'project-review-a2ui'), { recursive: true });
       const readers = createDwsCliReaders(report);
       const reportProvider = createDwsReportSource({ ...readers, ...report });
-      workflow = new BusinessA2UITest({ databasePath, bridge, policy, reportProvider });
+      const writer = report.enableWrites === true ? createDwsCliWriter(report) : undefined;
+      const decisionApplier = writer ? params => applyDwsDecision({ writer, ...params }) : undefined;
+      workflow = new BusinessA2UITest({ databasePath, bridge, policy, reportProvider, decisionApplier });
       workflow.unsubscribe = bridge.onCardAction?.(event => workflow?.handleAction(event));
     },
     stop,

@@ -8,7 +8,7 @@ import { BusinessA2UITest } from '../plugin/business-test.mjs';
 const policy = Object.freeze({ accountId:'main', senderId:'tester', sessionKey:'dingtalk:direct:tester', robotCode:'bot-test' });
 const clock = Date.parse('2026-11-05T09:00:00+08:00');
 
-function setup() {
+function setup(options = {}) {
   const directory = mkdtempSync(join(tmpdir(), 'case-business-card-'));
   const context = { ...policy, isDirect:true, isCurrent:()=>true };
   const updates=[];
@@ -18,7 +18,7 @@ function setup() {
   };
   const report={stage:'月度建档完成，会议待召开',meetingMonth:'2026年11月',targetReleaseMonth:'2026年12月',
     manualDecision:'未裁决：开/不开均未勾选',fallbackStart:'2026-11-25T10:30:00+08:00',fallbackEnd:'2026-11-25T11:30:00+08:00'};
-  const adapter=new BusinessA2UITest({databasePath:join(directory,'cards.sqlite'),bridge,policy,reportProvider:async()=>report,now:()=>clock});
+  const adapter=new BusinessA2UITest({databasePath:join(directory,'cards.sqlite'),bridge,policy,reportProvider:async()=>report,decisionApplier:options.decisionApplier,now:()=>clock});
   return {adapter,bridge,context,updates,directory,report};
 }
 
@@ -63,6 +63,27 @@ test('interactive business form proposes, returns, rejects stale confirmation, t
     assert.equal(h.adapter.cards.has(row.outTrackId),false);
   } finally { h.adapter.close(); rmSync(h.directory,{recursive:true,force:true}); }
 });
+
+test('confirmed card can use an injected DWS applier and still updates the same card', async()=>{
+  const applied=[];
+  const h=setup({decisionApplier:async params=>{ applied.push(params); return {mode:'dws',state:'completed',document:'verified',calendar:'verified',message:'写后回读完成'}; }});
+  try {
+    const created=await h.adapter.create(h.context,'tool-call-dws');
+    const row=h.adapter.transport.byInstance('instance-test');
+    const card=h.adapter.cards.get(row.outTrackId);
+    const form={decision:['open'],start:'2026-11-26T10:30:00+08:00',end:'2026-11-26T11:30:00+08:00'};
+    await h.adapter.handleAction(callback(row.outTrackId,h.context,'project_review.propose',{cardId:card.cardId,nonce:card.nonce,revision:card.revision,form},'msg-dws-propose'));
+    const confirmationId=h.updates.at(-1).messages[0].updateComponents.components.find(c=>c.id==='confirm-button').action.event.context.confirmationId;
+    const result=await h.adapter.handleAction(callback(row.outTrackId,h.context,'project_review.confirm',{cardId:card.cardId,nonce:card.nonce,revision:card.revision,confirmationId},'msg-dws-confirm'));
+    assert.equal(created.status,'accepted');
+    assert.equal(result.business,'completed');
+    assert.equal(h.updates.at(-1).status,'FINISH');
+    assert.equal(applied[0].change.start,form.start);
+    assert.equal(applied[0].report.fallbackStart,reportFallback(h));
+  } finally { h.adapter.close(); rmSync(h.directory,{recursive:true,force:true}); }
+});
+
+function reportFallback(h) { return h.report.fallbackStart; }
 
 test('unverified report time, forged callback identity and invalid actions fail closed', async()=>{
   const h=setup();

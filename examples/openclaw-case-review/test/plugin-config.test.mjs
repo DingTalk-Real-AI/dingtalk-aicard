@@ -19,3 +19,10 @@ test('missing scope and invalid report range are rejected', () => {
   assert.throws(() => parsePluginConfig({ report: validConfig.report }), /PRIVATE_TEST_AND_REPORT_CONFIG_REQUIRED/);
   assert.throws(() => parsePluginConfig({ ...validConfig, report: { ...validConfig.report, periodEnd: 'bad' } }), /REPORT_PERIOD_INVALID/);
 });
+
+test('DWS writes remain disabled unless deployment explicitly enables them', () => {
+  const parsed = parsePluginConfig({ ...validConfig, report: { ...validConfig.report, enableWrites: true } });
+  assert.equal(parsed.report.enableWrites, true);
+  const defaultParsed = parsePluginConfig(validConfig);
+  assert.equal('enableWrites' in defaultParsed.report, false);
+});

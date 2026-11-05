@@ -75,6 +75,10 @@
           "periodEnd": {
             "type": "string",
             "format": "date-time"
+          },
+          "enableWrites": {
+            "type": "boolean",
+            "description": "Enable confirmed DWS document/calendar writes and mandatory readback; omitted or false keeps the local sandbox."
           }
         }
       }

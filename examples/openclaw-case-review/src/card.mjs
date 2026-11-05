@@ -61,11 +61,13 @@ export function backDelta(messages) {
 }
 
 export function resultDelta(messages,result) {
-  if(result.mode!=='sandbox')throw new Error('PRODUCTION_NOT_IMPLEMENTED');
+  if(!['sandbox','dws'].includes(result.mode))throw new Error('UNKNOWN_RESULT_MODE');
   return [{version:'v1.0',updateComponents:{surfaceId:messages[0].createSurface.surfaceId,components:[
     {id:'root',component:'Column',gap:12,children:['title','result','result-scope']},
-    text('title',result.state==='completed'?'兜底会｜沙盒处理完成':'兜底会｜沙盒处理未完成',{bold:true}),
+    text('title',result.mode==='dws'
+      ? (result.state==='completed'?'兜底会｜DWS 处理完成':'兜底会｜DWS 处理未完成')
+      : (result.state==='completed'?'兜底会｜沙盒处理完成':'兜底会｜沙盒处理未完成'),{bold:true}),
     md('result',result.message),
-    text('result-scope','测试结果，不代表真实文档或日程已改变。',{variant:'caption',maxLine:5})
+    text('result-scope',result.mode==='dws'?'已按部署配置执行并完成写后回读。':'测试结果，不代表真实文档或日程已改变。',{variant:'caption',maxLine:5})
   ]}}];
 }

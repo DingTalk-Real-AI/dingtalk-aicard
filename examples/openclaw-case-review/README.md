@@ -26,13 +26,14 @@ Configure the OpenClaw plugin locally with deployment-owned values; do not commi
     "dwsCliEntry": "<absolute-path-to-dws.js>",
     "documentId": "<report-document-id>",
     "periodStart": "2027-03-01T00:00:00+08:00",
-    "periodEnd": "2027-04-01T00:00:00+08:00"
+    "periodEnd": "2027-04-01T00:00:00+08:00",
+    "enableWrites": false
   }
 }
 ```
 
 The `integration/dws-cli-reader.mjs` adapter uses OpenClaw's public `runUtf8CommandWithTimeout` process helper (OpenClaw 2026.10.9 or later) to run only fixed read-only DWS CLI argument vectors. The companion `integration/dws-cli-writer.mjs` exposes only fixed document str-replace, calendar reschedule, and calendar delete operations, and separate document/event readback methods. Both bound execution time and output, request process-tree cleanup, and make no retries. It follows returned calendar cursors. `integration/dws-report-source.mjs` requires complete reads, unique confirmed meetings, and exposes document/calendar attendee differences. DWS authentication remains in the local DWS profile; no token is stored in the plugin.
 
-The `plugin/business-test.mjs` state machine rejects untrusted callbacks and checks the card instance, user, nonce, revision, TTL, action allowlist, and callback idempotency before updating the card. The Connector bridge remains responsible for robot identity, card creation/update, and the existing Stream connection. The public example defaults to a local sandbox; enabling a deployment-owned writer is a separate integration step and must perform document write/readback before calendar write/readback.
+The `plugin/business-test.mjs` state machine rejects untrusted callbacks and checks the card instance, user, nonce, revision, TTL, action allowlist, and callback idempotency before updating the card. The Connector bridge remains responsible for robot identity, card creation/update, and the existing Stream connection. The public example defaults to a local sandbox. Set `report.enableWrites` to `true` only in a deployment-owned configuration after private-card acceptance; the confirm action then performs document write/readback before calendar write/readback and shows the result on the same card.
 
 These files are an example integration layer, not a Connector feature or a production DWS workflow. They require the optional `@dingtalk-connector/a2ui-bridge` capability and remain inactive if it is absent. The Connector owns app authentication, robot delivery, and the existing Stream callback; the business plugin owns authorization scope, card state, and sandbox actions. Validate the payload with `dws aicard lint`, then verify delivery, client rendering, callbacks, business writes, and readback in the target deployment.

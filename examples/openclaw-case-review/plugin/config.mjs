@@ -29,6 +29,7 @@ export function parsePluginConfig(value) {
       dwsCliEntry: report.dwsCliEntry,
       periodStart: report.periodStart,
       periodEnd: report.periodEnd,
+      ...(report.enableWrites === true ? { enableWrites: true } : {}),
       ...(nonEmpty(report.profile) ? { profile: report.profile } : {}),
     }),
   });

@@ -35,6 +35,11 @@ export class SandboxWorkflow {
   }
   close(){this.db.close();}
   row(table,id){const r=this.db.prepare(`SELECT data FROM ${table} WHERE id=?`).get(id); return r?JSON.parse(r.data):null;}
+  confirmation(cardId, confirmationId) {
+    const row = this.db.prepare('SELECT card,data FROM confirmations WHERE id=?').get(confirmationId);
+    if (!row || row.card !== cardId) return null;
+    return JSON.parse(row.data);
+  }
   save(table,id,data){this.db.prepare(`UPDATE ${table} SET data=? WHERE id=?`).run(JSON.stringify(data),id);}
   log(actor,card,action,detail){this.db.prepare('INSERT INTO audit(at,actor,card,action,detail) VALUES(?,?,?,?,?)').run(this.now(),actor,card,action,JSON.stringify(detail));}
   transaction(fn) {this.db.exec('BEGIN IMMEDIATE');try{const result=fn();this.db.exec('COMMIT');return result;}catch(e){this.db.exec('ROLLBACK');throw e;}}
