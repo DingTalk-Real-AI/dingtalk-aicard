@@ -46,6 +46,7 @@ test('DWS report source returns verified document/calendar facts and highlights 
   assert.match(report.attendeeStatus, /文档写.*待确认/);
   assert.match(report.attendeeStatus, /已接受参会人/);
   assert.equal(report.manualDecision, '未裁决：开/不开均未勾选');
+  assert.equal(report.decisionControl, '- [ ] 开\n- [ ] 不开');
   assert.deepEqual(eventReads,[
     {start:'2026-11-10T00:00:00+08:00',end:'2026-11-11T00:00:00+08:00'},
     {start:'2026-11-25T00:00:00+08:00',end:'2026-11-26T00:00:00+08:00'},

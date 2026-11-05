@@ -67,6 +67,13 @@ function decision(markdown) {
   return '未裁决：开/不开均未勾选';
 }
 
+function decisionControl(markdown) {
+  const control = section(markdown, '兜底会控制');
+  const lines = control.split(/\r?\n/u).filter(line => /^\s*-\s*\[[ xX]\]\s*(?:开|不开)\s*$/u.test(line));
+  if (lines.length !== 2) throw new Error('DWS_DECISION_CONTROL_NOT_UNIQUE');
+  return lines.join('\n');
+}
+
 function attendeeStatus(markdown, event) {
   const documentSaysUnconfirmed = /其他参会人名单尚未确认|其他参会人.*待确认/u.test(markdown);
   const accepted = event.acceptedAttendees.filter(name => name !== event.organizerName);
@@ -131,6 +138,7 @@ export function createDwsReportSource({ readDocument, listEvents, documentId, pe
       initialEventId: initial.eventId,
       attendeeStatus: attendeeStatus(markdown, fallback),
       manualDecision: decision(markdown),
+      decisionControl: decisionControl(markdown),
     };
     if (!report.stage || !report.meetingMonth || !report.fallbackStart || !report.fallbackEnd) {
       throw new Error('DWS_REPORT_REQUIRED_FACT_MISSING');
